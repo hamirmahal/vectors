@@ -1,0 +1,142 @@
+#[derive(Debug, PartialEq)]
+struct ThreeDVector {
+    x: f64,
+    y: f64,
+    z: f64,
+}
+impl ThreeDVector {
+    fn cross(&self, b: &ThreeDVector) -> ThreeDVector {
+        ThreeDVector {
+            x: self.y * b.z - self.z * b.y,
+            y: self.z * b.x - self.x * b.z,
+            z: self.x * b.y - self.y * b.x,
+        }
+    }
+    fn dot(&self, v: &ThreeDVector) -> f64 {
+        self.x * v.x + self.y * v.y + self.z * v.z
+    }
+}
+
+fn main() {
+    let f1 = ThreeDVector {
+        x: 10.0,
+        y: -20.4,
+        z: 2.0,
+    };
+    let f2 = ThreeDVector {
+        x: -15.0,
+        y: 0.0,
+        z: -6.2,
+    };
+    let result = quadratic_equation(9.0, -126.0, 441.0);
+    let the_angle_between_f1_and_f2 = the_angle_between(&f1, &f2);
+    println!("The magnitude of f1 is {}", the_magnitude_of(&f1));
+    println!("The magnitude of f2 is {}", the_magnitude_of(&f2));
+    println!("The roots of the equation are {:?}", result);
+    println!("f1 cross f2 is {:?}", f1.cross(&f2));
+    println!(
+        "The angle between f1 and f2 is {} degrees",
+        the_angle_between_f1_and_f2
+    );
+}
+
+fn quadratic_equation(a: f64, b: f64, c: f64) -> (f64, f64) {
+    let discriminant = b.powi(2) - 4. * a * c;
+    let root1 = (-b + discriminant.sqrt()) / (2. * a);
+    let root2 = (-b - discriminant.sqrt()) / (2. * a);
+    (root1, root2)
+}
+/// This function returns the inverse cosine of a number in degrees.
+fn inverse_cosine(x: f64) -> f64 {
+    x.acos().to_degrees()
+}
+fn the_magnitude_of(v: &ThreeDVector) -> f64 {
+    (v.x.powi(2) + v.y.powi(2) + v.z.powi(2)).sqrt()
+}
+/// This function returns the angle between two vectors in degrees.
+fn the_angle_between(a: &ThreeDVector, b: &ThreeDVector) -> f64 {
+    let cos_of_angle = a.dot(b) / (the_magnitude_of(a) * the_magnitude_of(b));
+    inverse_cosine(cos_of_angle)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    const V1: ThreeDVector = ThreeDVector {
+        x: 10.0,
+        y: -20.4,
+        z: 2.0,
+    };
+    const V2: ThreeDVector = ThreeDVector {
+        x: -15.0,
+        y: 0.0,
+        z: -6.2,
+    };
+
+    #[test]
+    fn test_cross() {
+        let perpendicular_vectors = [
+            ThreeDVector {
+                x: 3.0,
+                y: -1.0,
+                z: 4.0,
+            },
+            ThreeDVector {
+                x: 7.0,
+                y: 1.0,
+                z: -5.0,
+            },
+        ];
+        let there_is_a_floating_point_discrepancy = the_magnitude_of(&perpendicular_vectors[0])
+            * the_magnitude_of(&perpendicular_vectors[1])
+            > the_magnitude_of(&perpendicular_vectors[0].cross(&perpendicular_vectors[1]));
+        let the_magnitude_of_the_cross_product_of_perpendicular_vectors_is_the_product_of_their_magnitudes =
+            (the_magnitude_of(&perpendicular_vectors[0])
+                * the_magnitude_of(&perpendicular_vectors[1])
+                - the_magnitude_of(&perpendicular_vectors[0].cross(&perpendicular_vectors[1])))
+                < 0.00000000000001;
+        assert!(the_magnitude_of_the_cross_product_of_perpendicular_vectors_is_the_product_of_their_magnitudes);
+        assert!(there_is_a_floating_point_discrepancy);
+    }
+    #[test]
+    fn test_dot() {
+        assert_eq!(V1.dot(&V2), -162.4);
+    }
+    #[test]
+    fn test_quadratic_equation() {
+        assert_eq!(quadratic_equation(9.0, -126.0, 441.0), (7.0, 7.0));
+    }
+    #[test]
+    fn test_the_magnitude_of() {
+        assert_eq!(the_magnitude_of(&V1), 22.807016464237492);
+        assert_eq!(the_magnitude_of(&V2), 16.230834852218784);
+        assert_eq!(
+            the_magnitude_of(&ThreeDVector {
+                x: -7.0,
+                y: 9.0,
+                z: 0.0
+            }),
+            11.40175425099138
+        );
+        assert_eq!(
+            the_magnitude_of(&ThreeDVector {
+                x: -3.0,
+                y: 5.0,
+                z: 0.0
+            }),
+            5.830951894845301
+        );
+        assert_eq!(
+            the_magnitude_of(&ThreeDVector {
+                x: 10.0,
+                y: 23.0,
+                z: 0.0
+            }),
+            25.079872407968907
+        );
+    }
+    #[test]
+    fn test_the_angle_between() {
+        assert_eq!(the_angle_between(&V1, &V2), 116.02154864365895);
+    }
+}
