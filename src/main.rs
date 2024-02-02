@@ -1,6 +1,5 @@
 #[derive(Debug)]
 struct Vector<const N: usize>([f64; N]);
-
 impl Vector<3> {
     fn cross(&self, b: &Vector<3>) -> Vector<3> {
         Vector([
@@ -10,7 +9,6 @@ impl Vector<3> {
         ])
     }
 }
-
 impl<const N: usize> Vector<N> {
     fn dot(&self, v: &Vector<N>) -> f64 {
         self.0.iter().zip(v.0.iter()).map(|(a, b)| a * b).sum()
