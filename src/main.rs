@@ -1,32 +1,34 @@
-#[derive(Debug, PartialEq)]
-struct ThreeDVector {
-    x: f64,
-    y: f64,
-    z: f64,
+#[derive(Debug)]
+struct Vector<const N: usize> {
+    data: [f64; N],
 }
-impl ThreeDVector {
-    fn cross(&self, b: &ThreeDVector) -> ThreeDVector {
-        ThreeDVector {
-            x: self.y * b.z - self.z * b.y,
-            y: self.z * b.x - self.x * b.z,
-            z: self.x * b.y - self.y * b.x,
+
+impl Vector<3> {
+    fn cross(&self, b: &Vector<3>) -> Vector<3> {
+        Vector {
+            data: [
+                self.data[1] * b.data[2] - self.data[2] * b.data[1],
+                self.data[2] * b.data[0] - self.data[0] * b.data[2],
+                self.data[0] * b.data[1] - self.data[1] * b.data[0],
+            ],
         }
     }
-    fn dot(&self, v: &ThreeDVector) -> f64 {
-        self.x * v.x + self.y * v.y + self.z * v.z
+}
+
+impl<const N: usize> Vector<N> {
+    fn dot(&self, v: &Vector<N>) -> f64 {
+        std::array::from_fn::<f64, N, _>(|i| self.data[i] * v.data[i])
+            .iter()
+            .sum()
     }
 }
 
 fn main() {
-    let f1 = ThreeDVector {
-        x: 10.0,
-        y: -20.4,
-        z: 2.0,
+    let f1 = Vector {
+        data: [10.0, -20.4, 2.0],
     };
-    let f2 = ThreeDVector {
-        x: -15.0,
-        y: 0.0,
-        z: -6.2,
+    let f2 = Vector {
+        data: [-15.0, 0.0, -6.2],
     };
     let result = quadratic_equation(9.0, -126.0, 441.0);
     let the_angle_between_f1_and_f2 = the_angle_between(&f1, &f2);
@@ -50,11 +52,11 @@ fn quadratic_equation(a: f64, b: f64, c: f64) -> (f64, f64) {
 fn inverse_cosine(x: f64) -> f64 {
     x.acos().to_degrees()
 }
-fn the_magnitude_of(v: &ThreeDVector) -> f64 {
-    (v.x.powi(2) + v.y.powi(2) + v.z.powi(2)).sqrt()
+fn the_magnitude_of<const N: usize>(v: &Vector<N>) -> f64 {
+    v.data.iter().map(|x| x.powi(2)).sum::<f64>().sqrt()
 }
 /// This function returns the angle between two vectors in degrees.
-fn the_angle_between(a: &ThreeDVector, b: &ThreeDVector) -> f64 {
+fn the_angle_between<const N: usize>(a: &Vector<N>, b: &Vector<N>) -> f64 {
     let cos_of_angle = a.dot(b) / (the_magnitude_of(a) * the_magnitude_of(b));
     inverse_cosine(cos_of_angle)
 }
@@ -62,29 +64,21 @@ fn the_angle_between(a: &ThreeDVector, b: &ThreeDVector) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const V1: ThreeDVector = ThreeDVector {
-        x: 10.0,
-        y: -20.4,
-        z: 2.0,
+    const V1: Vector<3> = Vector {
+        data: [10.0, -20.4, 2.0],
     };
-    const V2: ThreeDVector = ThreeDVector {
-        x: -15.0,
-        y: 0.0,
-        z: -6.2,
+    const V2: Vector<3> = Vector {
+        data: [-15.0, 0.0, -6.2],
     };
 
     #[test]
     fn test_cross() {
         let perpendicular_vectors = [
-            ThreeDVector {
-                x: 3.0,
-                y: -1.0,
-                z: 4.0,
+            Vector {
+                data: [3.0, -1.0, 4.0],
             },
-            ThreeDVector {
-                x: 7.0,
-                y: 1.0,
-                z: -5.0,
+            Vector {
+                data: [7.0, 1.0, -5.0],
             },
         ];
         let there_is_a_floating_point_discrepancy = the_magnitude_of(&perpendicular_vectors[0])
@@ -111,27 +105,15 @@ mod tests {
         assert_eq!(the_magnitude_of(&V1), 22.807016464237492);
         assert_eq!(the_magnitude_of(&V2), 16.230834852218784);
         assert_eq!(
-            the_magnitude_of(&ThreeDVector {
-                x: -7.0,
-                y: 9.0,
-                z: 0.0
-            }),
+            the_magnitude_of(&Vector { data: [-7.0, 9.0] }),
             11.40175425099138
         );
         assert_eq!(
-            the_magnitude_of(&ThreeDVector {
-                x: -3.0,
-                y: 5.0,
-                z: 0.0
-            }),
+            the_magnitude_of(&Vector { data: [-3.0, 5.0] }),
             5.830951894845301
         );
         assert_eq!(
-            the_magnitude_of(&ThreeDVector {
-                x: 10.0,
-                y: 23.0,
-                z: 0.0
-            }),
+            the_magnitude_of(&Vector { data: [10.0, 23.0] }),
             25.079872407968907
         );
     }
