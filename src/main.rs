@@ -1,35 +1,25 @@
 #[derive(Debug)]
-struct Vector<const N: usize> {
-    data: [f64; N],
-}
+struct Vector<const N: usize>([f64; N]);
 
 impl Vector<3> {
     fn cross(&self, b: &Vector<3>) -> Vector<3> {
-        Vector {
-            data: [
-                self.data[1] * b.data[2] - self.data[2] * b.data[1],
-                self.data[2] * b.data[0] - self.data[0] * b.data[2],
-                self.data[0] * b.data[1] - self.data[1] * b.data[0],
-            ],
-        }
+        Vector([
+            self.0[1] * b.0[2] - self.0[2] * b.0[1],
+            self.0[2] * b.0[0] - self.0[0] * b.0[2],
+            self.0[0] * b.0[1] - self.0[1] * b.0[0],
+        ])
     }
 }
 
 impl<const N: usize> Vector<N> {
     fn dot(&self, v: &Vector<N>) -> f64 {
-        std::array::from_fn::<f64, N, _>(|i| self.data[i] * v.data[i])
-            .iter()
-            .sum()
+        self.0.iter().zip(v.0.iter()).map(|(a, b)| a * b).sum()
     }
 }
 
 fn main() {
-    let f1 = Vector {
-        data: [10.0, -20.4, 2.0],
-    };
-    let f2 = Vector {
-        data: [-15.0, 0.0, -6.2],
-    };
+    let f1 = Vector([10.0, -20.4, 2.0]);
+    let f2 = Vector([-15.0, 0.0, -6.2]);
     let result = quadratic_equation(9.0, -126.0, 441.0);
     let the_angle_between_f1_and_f2 = the_angle_between(&f1, &f2);
     println!("The magnitude of f1 is {}", the_magnitude_of(&f1));
@@ -53,7 +43,7 @@ fn inverse_cosine(x: f64) -> f64 {
     x.acos().to_degrees()
 }
 fn the_magnitude_of<const N: usize>(v: &Vector<N>) -> f64 {
-    v.data.iter().map(|x| x.powi(2)).sum::<f64>().sqrt()
+    v.0.iter().map(|x| x.powi(2)).sum::<f64>().sqrt()
 }
 /// This function returns the angle between two vectors in degrees.
 fn the_angle_between<const N: usize>(a: &Vector<N>, b: &Vector<N>) -> f64 {
@@ -64,23 +54,12 @@ fn the_angle_between<const N: usize>(a: &Vector<N>, b: &Vector<N>) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
-    const V1: Vector<3> = Vector {
-        data: [10.0, -20.4, 2.0],
-    };
-    const V2: Vector<3> = Vector {
-        data: [-15.0, 0.0, -6.2],
-    };
+    const V1: Vector<3> = Vector([10.0, -20.4, 2.0]);
+    const V2: Vector<3> = Vector([-15.0, 0.0, -6.2]);
 
     #[test]
     fn test_cross() {
-        let perpendicular_vectors = [
-            Vector {
-                data: [3.0, -1.0, 4.0],
-            },
-            Vector {
-                data: [7.0, 1.0, -5.0],
-            },
-        ];
+        let perpendicular_vectors = [Vector([3.0, -1.0, 4.0]), Vector([7.0, 1.0, -5.0])];
         let there_is_a_floating_point_discrepancy = the_magnitude_of(&perpendicular_vectors[0])
             * the_magnitude_of(&perpendicular_vectors[1])
             > the_magnitude_of(&perpendicular_vectors[0].cross(&perpendicular_vectors[1]));
@@ -104,18 +83,9 @@ mod tests {
     fn test_the_magnitude_of() {
         assert_eq!(the_magnitude_of(&V1), 22.807016464237492);
         assert_eq!(the_magnitude_of(&V2), 16.230834852218784);
-        assert_eq!(
-            the_magnitude_of(&Vector { data: [-7.0, 9.0] }),
-            11.40175425099138
-        );
-        assert_eq!(
-            the_magnitude_of(&Vector { data: [-3.0, 5.0] }),
-            5.830951894845301
-        );
-        assert_eq!(
-            the_magnitude_of(&Vector { data: [10.0, 23.0] }),
-            25.079872407968907
-        );
+        assert_eq!(the_magnitude_of(&Vector([-7.0, 9.0])), 11.40175425099138);
+        assert_eq!(the_magnitude_of(&Vector([-3.0, 5.0])), 5.830951894845301);
+        assert_eq!(the_magnitude_of(&Vector([10.0, 23.0])), 25.079872407968907);
     }
     #[test]
     fn test_the_angle_between() {
