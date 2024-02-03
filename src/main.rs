@@ -31,10 +31,10 @@ fn main() {
 }
 
 fn quadratic_equation(a: f64, b: f64, c: f64) -> (f64, f64) {
-    let discriminant = b.powi(2) - 4. * a * c;
-    let root1 = (-b + discriminant.sqrt()) / (2. * a);
-    let root2 = (-b - discriminant.sqrt()) / (2. * a);
-    (root1, root2)
+    (
+        (-b + f64::sqrt(b.powi(2) - 4.0 * a * c)) / (2.0 * a),
+        (-b - f64::sqrt(b.powi(2) - 4.0 * a * c)) / (2.0 * a),
+    )
 }
 /// This function returns the inverse cosine of a number in degrees.
 fn inverse_cosine(x: f64) -> f64 {
