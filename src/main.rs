@@ -20,6 +20,7 @@ fn main() {
     let f2 = Vector([-15.0, 0.0, -6.2]);
     let result = quadratic_equation(9.0, -126.0, 441.0);
     let the_angle_between_f1_and_f2 = the_angle_between(&f1, &f2);
+    let centripetal_acceleration = get_centripetal_acceleration(20.0, 14.9);
     println!("The magnitude of f1 is {}", the_magnitude_of(&f1));
     println!("The magnitude of f2 is {}", the_magnitude_of(&f2));
     println!("The roots of the equation are {:?}", result);
@@ -28,8 +29,15 @@ fn main() {
         "The angle between f1 and f2 is {} degrees",
         the_angle_between_f1_and_f2
     );
+    println!(
+        "The centripetal acceleration is {}",
+        centripetal_acceleration
+    );
 }
 
+fn get_centripetal_acceleration(v: f64, r: f64) -> f64 {
+    v.powi(2) / r
+}
 fn quadratic_equation(a: f64, b: f64, c: f64) -> (f64, f64) {
     (
         (-b + f64::sqrt(b.powi(2) - 4.0 * a * c)) / (2.0 * a),
@@ -68,6 +76,10 @@ mod tests {
                 < 0.00000000000001;
         assert!(the_magnitude_of_the_cross_product_of_perpendicular_vectors_is_the_product_of_their_magnitudes);
         assert!(there_is_a_floating_point_discrepancy);
+    }
+    #[test]
+    fn test_centripetal_acceleration() {
+        assert_eq!(get_centripetal_acceleration(20.0, 14.9), 26.845637583892618);
     }
     #[test]
     fn test_dot() {
