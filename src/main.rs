@@ -21,6 +21,10 @@ fn main() {
     let result = quadratic_equation(9.0, -126.0, 441.0);
     let the_angle_between_f1_and_f2 = the_angle_between(&f1, &f2);
     let centripetal_acceleration = get_centripetal_acceleration(20.0, 14.9);
+    let v_x = cos(29.0) * 17000.0;
+    let v_y = sin(29.0) * 17000.0;
+    dbg!(v_x);
+    dbg!(v_y);
     println!("The magnitude of f1 is {}", the_magnitude_of(&f1));
     println!("The magnitude of f2 is {}", the_magnitude_of(&f2));
     println!("The roots of the equation are {:?}", result);
@@ -35,6 +39,10 @@ fn main() {
     );
 }
 
+/// This function returns the cosine of an angle in degrees.
+fn cos(x: f64) -> f64 {
+    x.to_radians().cos()
+}
 fn get_centripetal_acceleration(v: f64, r: f64) -> f64 {
     v.powi(2) / r
 }
@@ -47,6 +55,10 @@ fn quadratic_equation(a: f64, b: f64, c: f64) -> (f64, f64) {
 /// This function returns the inverse cosine of a number in degrees.
 fn inverse_cosine(x: f64) -> f64 {
     x.acos().to_degrees()
+}
+/// This function returns the sine of an angle in degrees.
+fn sin(x: f64) -> f64 {
+    x.to_radians().sin()
 }
 fn the_magnitude_of<const N: usize>(v: &Vector<N>) -> f64 {
     v.0.iter().map(|x| x.powi(2)).sum::<f64>().sqrt()
@@ -82,12 +94,26 @@ mod tests {
         assert_eq!(get_centripetal_acceleration(20.0, 14.9), 26.845637583892618);
     }
     #[test]
+    fn test_cos() {
+        assert_eq!(cos(29.0) * 17000.0, 14868.535021369727);
+        assert_eq!(cos(30.0), 0.8660254037844387);
+        assert_eq!(cos(45.0), std::f64::consts::FRAC_1_SQRT_2);
+        assert_eq!(cos(60.0), 0.5000000000000001);
+    }
+    #[test]
     fn test_dot() {
         assert_eq!(V1.dot(&V2), -162.4);
     }
     #[test]
     fn test_quadratic_equation() {
         assert_eq!(quadratic_equation(9.0, -126.0, 441.0), (7.0, 7.0));
+    }
+    #[test]
+    fn test_sin() {
+        assert_eq!(sin(29.0) * 17000.0, 8241.76354418773);
+        assert_eq!(sin(30.0), 0.49999999999999994);
+        assert_eq!(sin(45.0), 0.7071067811865475);
+        assert_eq!(sin(60.0), f64::sqrt(3.0) / 2.0);
     }
     #[test]
     fn test_the_magnitude_of() {
