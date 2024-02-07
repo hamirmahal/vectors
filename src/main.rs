@@ -14,6 +14,29 @@ impl<const N: usize> Vector<N> {
         self.0.iter().zip(v.0.iter()).map(|(a, b)| a * b).sum()
     }
 }
+impl<const N: usize> std::fmt::Display for Vector<N> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut result = String::new();
+        for (i, &x) in self.0.iter().enumerate() {
+            if x == 0.0 {
+                continue;
+            }
+            if !result.is_empty() {
+                result.push(' ');
+            }
+            if x < 0.0 {
+                result.push_str("- ");
+            } else if i != 0 && !result.is_empty() {
+                result.push_str("+ ");
+            }
+            if x.abs() != 1.0 {
+                result.push_str(&format!("{}", x.abs()));
+            }
+            result.push((b'i' + i as u8) as char);
+        }
+        write!(f, "{}", if result.is_empty() { "0i" } else { &result })
+    }
+}
 
 fn main() {
     let f1 = Vector([10.0, -20.4, 2.0]);
@@ -28,7 +51,7 @@ fn main() {
     println!("The magnitude of f1 is {}", the_magnitude_of(&f1));
     println!("The magnitude of f2 is {}", the_magnitude_of(&f2));
     println!("The roots of the equation are {:?}", result);
-    println!("f1 cross f2 is {:?}", f1.cross(&f2));
+    println!("f1 cross f2 is {}", f1.cross(&f2));
     println!(
         "The angle between f1 and f2 is {} degrees",
         the_angle_between_f1_and_f2
@@ -74,6 +97,11 @@ mod tests {
     use super::*;
     const V1: Vector<3> = Vector([10.0, -20.4, 2.0]);
     const V2: Vector<3> = Vector([-15.0, 0.0, -6.2]);
+    fn verify<const N: usize>(expected_output: &[(Vector<N>, &str)]) {
+        expected_output
+            .iter()
+            .for_each(|(v, expected)| assert_eq!(format!("{}", v), *expected));
+    }
 
     #[test]
     fn test_cross() {
@@ -99,6 +127,52 @@ mod tests {
         assert_eq!(cos(30.0), 0.8660254037844387);
         assert_eq!(cos(45.0), std::f64::consts::FRAC_1_SQRT_2);
         assert_eq!(cos(60.0), 0.5000000000000001);
+    }
+    #[test]
+    fn test_display() {
+        let expected_3d_vector_output = [
+            (Vector([0.0, 2.200, 15.22]), "2.2j + 15.22k"),
+            (Vector([-1.0, -1.0, -1.0]), "- i - j - k"),
+            (Vector([-1.0, 1.0, -1.0]), "- i + j - k"),
+            (Vector([3.0, -1.0, 4.0]), "3i - j + 4k"),
+            (Vector([7.0, 1.0, -5.0]), "7i + j - 5k"),
+            (Vector([1.0, -1.0, 1.0]), "i - j + k"),
+            (Vector([1.0, 1.0, 1.0]), "i + j + k"),
+            (Vector([-1.0, -1.0, 0.0]), "- i - j"),
+            (Vector([-1.0, 1.0, 0.0]), "- i + j"),
+            (Vector([1.0, -1.0, 0.0]), "i - j"),
+            (Vector([1.0, 1.0, 0.0]), "i + j"),
+            (Vector([1.0, 0.0, 1.0]), "i + k"),
+            (Vector([-1.0, 0.0, 0.0]), "- i"),
+            (Vector([0.0, -1.0, 0.0]), "- j"),
+            (Vector([0.0, 0.0, -1.0]), "- k"),
+            (Vector([0.0, 0.0, 0.0]), "0i"),
+            (Vector([1.0, 0.0, 0.0]), "i"),
+            (Vector([0.0, 1.0, 0.0]), "j"),
+            (Vector([0.0, 0.0, 1.0]), "k"),
+        ];
+        let expected_2d_vector_output = [
+            (Vector([-1.0, -1.0]), "- i - j"),
+            (Vector([-1.0, 1.0]), "- i + j"),
+            (Vector([1.0, -1.0]), "i - j"),
+            (Vector([1.0, 1.0]), "i + j"),
+            (Vector([-1.0, 0.0]), "- i"),
+            (Vector([0.0, -1.0]), "- j"),
+            (Vector([0.0, 0.0]), "0i"),
+            (Vector([0.0, 1.0]), "j"),
+            (Vector([1.0, 0.0]), "i"),
+        ];
+        verify(&expected_3d_vector_output);
+        verify(&expected_2d_vector_output);
+        assert_eq!(format!("{}", Vector([1., 2., 3., 4.])), "i + 2j + 3k + 4l");
+        assert_eq!(
+            format!("{}", Vector([1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16., 17., 18.])),
+            "i + 2j + 3k + 4l + 5m + 6n + 7o + 8p + 9q + 10r + 11s + 12t + 13u + 14v + 15w + 16x + 17y + 18z"
+        );
+        assert_eq!(
+            format!("{}", Vector([1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16., 17., 18., 19., 20.])),
+            "i + 2j + 3k + 4l + 5m + 6n + 7o + 8p + 9q + 10r + 11s + 12t + 13u + 14v + 15w + 16x + 17y + 18z + 19{ + 20|"
+        );
     }
     #[test]
     fn test_dot() {
