@@ -1,4 +1,3 @@
-#[derive(Debug)]
 struct Vector<const N: usize>([f64; N]);
 impl Vector<3> {
     fn cross(&self, b: &Vector<3>) -> Vector<3> {
