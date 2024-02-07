@@ -192,6 +192,13 @@ mod tests {
     fn test_the_magnitude_of() {
         assert_eq!(the_magnitude_of(&V1), 22.807016464237492);
         assert_eq!(the_magnitude_of(&V2), 16.230834852218784);
+        assert_eq!(the_magnitude_of(&Vector([3.0, 4.0])), 5.0);
+        assert_eq!(the_magnitude_of(&Vector([6.0, 8.0])), 10.0);
+        assert_eq!(the_magnitude_of(&Vector([3.0, 4.0, 0.0])), 5.0);
+        assert_eq!(the_magnitude_of(&Vector([6.0, 8.0, 0.0])), 10.0);
+        assert_eq!(the_magnitude_of(&Vector([3.0, 4.0, 0.0, 0.0])), 5.0);
+        assert_eq!(the_magnitude_of(&Vector([6.0, 8.0, 0.0, 0.0])), 10.0);
+        assert_eq!(the_magnitude_of(&Vector([0.0, 0.0, 3.0, 0.0, 4.0])), 5.0);
         assert_eq!(the_magnitude_of(&Vector([-7.0, 9.0])), 11.40175425099138);
         assert_eq!(the_magnitude_of(&Vector([-3.0, 5.0])), 5.830951894845301);
         assert_eq!(the_magnitude_of(&Vector([10.0, 23.0])), 25.079872407968907);
