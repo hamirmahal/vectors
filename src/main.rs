@@ -83,7 +83,7 @@ fn sin(x: f64) -> f64 {
     x.to_radians().sin()
 }
 fn the_magnitude_of<const N: usize>(v: &Vector<N>) -> f64 {
-    v.0.iter().map(|x| x.powi(2)).sum::<f64>().sqrt()
+    f64::sqrt(v.0.iter().map(|x| x.powi(2)).sum())
 }
 /// This function returns the angle between two vectors in degrees.
 fn the_angle_between<const N: usize>(a: &Vector<N>, b: &Vector<N>) -> f64 {
