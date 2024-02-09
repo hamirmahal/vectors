@@ -18,9 +18,7 @@ impl<const N: usize> std::fmt::Display for Vector<N> {
         let mut result = String::new();
         self.0.iter().enumerate().for_each(|(i, &x)| {
             if x != 0.0 {
-                if !result.is_empty() {
-                    result.push(' ');
-                }
+                result.push_str(if result.is_empty() { "" } else { " " });
                 if x < 0.0 {
                     result.push_str("- ");
                 } else if !result.is_empty() {
