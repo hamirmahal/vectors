@@ -27,7 +27,7 @@ impl<const N: usize> std::fmt::Display for Vector<N> {
                     result.push_str("+ ");
                 }
                 if x.abs() != 1.0 {
-                    result.push_str(&format!("{}", x.abs()));
+                    result.push_str(&x.abs().to_string());
                 }
                 result.push((b'i' + i as u8) as char);
             }
