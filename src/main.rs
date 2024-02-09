@@ -25,7 +25,7 @@ impl<const N: usize> std::fmt::Display for Vector<N> {
             }
             if x < 0.0 {
                 result.push_str("- ");
-            } else if i != 0 && !result.is_empty() {
+            } else if !result.is_empty() {
                 result.push_str("+ ");
             }
             if x.abs() != 1.0 {
