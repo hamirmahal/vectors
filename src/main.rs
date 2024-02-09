@@ -17,21 +17,20 @@ impl<const N: usize> std::fmt::Display for Vector<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut result = String::new();
         for (i, &x) in self.0.iter().enumerate() {
-            if x == 0.0 {
-                continue;
+            if x != 0.0 {
+                if !result.is_empty() {
+                    result.push(' ');
+                }
+                if x < 0.0 {
+                    result.push_str("- ");
+                } else if !result.is_empty() {
+                    result.push_str("+ ");
+                }
+                if x.abs() != 1.0 {
+                    result.push_str(&format!("{}", x.abs()));
+                }
+                result.push((b'i' + i as u8) as char);
             }
-            if !result.is_empty() {
-                result.push(' ');
-            }
-            if x < 0.0 {
-                result.push_str("- ");
-            } else if !result.is_empty() {
-                result.push_str("+ ");
-            }
-            if x.abs() != 1.0 {
-                result.push_str(&format!("{}", x.abs()));
-            }
-            result.push((b'i' + i as u8) as char);
         }
         write!(f, "{}", if result.is_empty() { "0i" } else { &result })
     }
