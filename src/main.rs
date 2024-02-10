@@ -48,6 +48,19 @@ impl<'a, const N: usize> std::ops::Add<&'a Vector<N>> for &'a Vector<N> {
         )
     }
 }
+impl<const N: usize> std::ops::Div<f64> for Vector<N> {
+    type Output = Self;
+    fn div(self, rhs: f64) -> Self {
+        Vector(
+            self.0
+                .iter()
+                .map(|&x| x / rhs)
+                .collect::<Vec<_>>()
+                .try_into()
+                .unwrap(),
+        )
+    }
+}
 
 fn main() {
     let f1 = Vector([10.0, -20.4, 2.0]);
@@ -238,5 +251,16 @@ mod tests {
             &(&Vector([1.0, 2.0, 3.0]) + &Vector([4.0, 5.0, 6.0])) + &Vector([7.0, 8.0, 9.0]),
             Vector([12.0, 15.0, 18.0])
         );
+    }
+    #[test]
+    fn test_vector_division_by_a_scalar() {
+        assert_eq!(Vector([-5.5]) / 5.5, Vector([-1.0]));
+        assert_eq!(Vector([1.0, 2.0]) / 2.0, Vector([0.5, 1.0]));
+        assert_eq!(Vector([3.0, 4.0]) / 2.0, Vector([1.5, 2.0]));
+        assert_eq!(Vector([6.0, 8.0]) / 2.0, Vector([3.0, 4.0]));
+        assert_eq!(Vector([1.234, 0.0]) / 2.0, Vector([0.617, 0.0]));
+        assert_eq!(Vector([555.55]) / 5.0, Vector([111.10999999999999]));
+        assert_eq!(Vector([3.0, 4.0, 0.0]) / 2.0, Vector([1.5, 2.0, 0.0]));
+        assert_eq!(Vector([1.0, 2.0, 3.0]) / 2.0, Vector([0.5, 1.0, 1.5]));
     }
 }
