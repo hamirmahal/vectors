@@ -68,6 +68,7 @@ fn main() {
     let result = quadratic_equation(9.0, -126.0, 441.0);
     let the_angle_between_f1_and_f2 = the_angle_between(&f1, &f2);
     let centripetal_acceleration = get_centripetal_acceleration(20.0, 14.9);
+    let net_force = get_net_force_using(24.0, Vector([-4.9, 0.0, 9.9]));
     let v_x = cos(29.0) * 17000.0;
     let v_y = sin(29.0) * 17000.0;
     dbg!(v_x);
@@ -76,6 +77,7 @@ fn main() {
     println!("The magnitude of f2 is {}", the_magnitude_of(&f2));
     println!("The roots of the equation are {:?}", result);
     println!("f1 cross f2 is {}", f1.cross(&f2));
+    println!("The net force is {}", net_force);
     println!(
         "The angle between f1 and f2 is {} degrees",
         the_angle_between_f1_and_f2
@@ -92,6 +94,17 @@ fn cos(x: f64) -> f64 {
 }
 fn get_centripetal_acceleration(v: f64, r: f64) -> f64 {
     v.powi(2) / r
+}
+fn get_net_force_using<const N: usize>(m_in_kg: f64, a_in_m_per_s2: Vector<N>) -> Vector<N> {
+    Vector(
+        a_in_m_per_s2
+            .0
+            .iter()
+            .map(|&x| m_in_kg * x)
+            .collect::<Vec<_>>()
+            .try_into()
+            .unwrap(),
+    )
 }
 fn quadratic_equation(a: f64, b: f64, c: f64) -> (f64, f64) {
     (
@@ -201,6 +214,15 @@ mod tests {
     #[test]
     fn test_dot() {
         assert_eq!(V1.dot(&V2), -162.4);
+    }
+    #[test]
+    fn test_get_net_force_using() {
+        let f_net_newtons = get_net_force_using(2100.0, Vector([49.0]));
+        let v1 = get_net_force_using(0.4, Vector([3.0, -1.0, 4.0]));
+        let v2 = get_net_force_using(0.4, Vector([3.00, 7.00]));
+        assert_eq!(v2, Vector([1.2000000000000002, 2.8000000000000003]));
+        assert_eq!(v1, Vector([1.2000000000000002, -0.4, 1.6]));
+        assert_eq!(f_net_newtons, Vector([102900.0]));
     }
     #[test]
     fn test_quadratic_equation() {
