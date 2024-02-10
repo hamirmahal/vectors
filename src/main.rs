@@ -71,6 +71,7 @@ fn main() {
     let net_force = get_net_force_using(24.0, Vector([-4.9, 0.0, 9.9]));
     let v_x = cos(29.0) * 17000.0;
     let v_y = sin(29.0) * 17000.0;
+    dbg!(inverse_tan(2.80 / 1.20));
     dbg!(v_x);
     dbg!(v_y);
     println!("The magnitude of f1 is {}", the_magnitude_of(&f1));
@@ -115,6 +116,10 @@ fn quadratic_equation(a: f64, b: f64, c: f64) -> (f64, f64) {
 /// This function returns the inverse cosine of a number in degrees.
 fn inverse_cosine(x: f64) -> f64 {
     x.acos().to_degrees()
+}
+/// This function returns the inverse tangent of a number in degrees.
+fn inverse_tan(x: f64) -> f64 {
+    x.atan().to_degrees()
 }
 /// This function returns the sine of an angle in degrees.
 fn sin(x: f64) -> f64 {
@@ -164,6 +169,13 @@ mod tests {
         assert_eq!(cos(30.0), 0.8660254037844387);
         assert_eq!(cos(45.0), std::f64::consts::FRAC_1_SQRT_2);
         assert_eq!(cos(60.0), 0.5000000000000001);
+    }
+    #[test]
+    fn test_inverse_tan() {
+        assert_eq!(inverse_tan(1.0), 45.0);
+        assert_eq!(inverse_tan(2.80 / 1.20), 66.80140948635182);
+        assert_eq!(inverse_tan(f64::sqrt(3.0)), 59.99999999999999);
+        assert_eq!(inverse_tan(1.0 / f64::sqrt(3.0)), 30.000000000000004);
     }
     #[test]
     fn test_display() {
