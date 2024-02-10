@@ -237,6 +237,9 @@ mod tests {
     }
     #[test]
     fn test_the_magnitude_of() {
+        assert_eq!(the_magnitude_of(&Vector([0.0])), 0.0);
+        assert_eq!(the_magnitude_of(&Vector([1.0])), 1.0);
+        assert_eq!(the_magnitude_of(&Vector([-1.0])), 1.0);
         assert_eq!(the_magnitude_of(&V1), 22.807016464237492);
         assert_eq!(the_magnitude_of(&V2), 16.230834852218784);
         assert_eq!(the_magnitude_of(&Vector([3.0, 4.0])), 5.0);
@@ -249,6 +252,10 @@ mod tests {
         assert_eq!(the_magnitude_of(&Vector([-7.0, 9.0])), 11.40175425099138);
         assert_eq!(the_magnitude_of(&Vector([-3.0, 5.0])), 5.830951894845301);
         assert_eq!(the_magnitude_of(&Vector([10.0, 23.0])), 25.079872407968907);
+        assert_eq!(
+            the_magnitude_of(&Vector([1.2000000000000002, 2.8000000000000003])),
+            3.0463092423455636
+        );
     }
     #[test]
     fn test_the_angle_between() {
