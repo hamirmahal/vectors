@@ -1,3 +1,4 @@
+#[derive(Debug, PartialEq)]
 struct Vector<const N: usize>([f64; N]);
 impl Vector<3> {
     fn cross(&self, b: &Vector<3>) -> Vector<3> {
@@ -31,6 +32,20 @@ impl<const N: usize> std::fmt::Display for Vector<N> {
             }
         });
         write!(f, "{}", if result.is_empty() { "0i" } else { &result })
+    }
+}
+impl<'a, const N: usize> std::ops::Add<&'a Vector<N>> for &'a Vector<N> {
+    type Output = Vector<N>;
+    fn add(self, rhs: &'a Vector<N>) -> Vector<N> {
+        Vector(
+            self.0
+                .iter()
+                .zip(rhs.0.iter())
+                .map(|(&x, &y)| x + y)
+                .collect::<Vec<_>>()
+                .try_into()
+                .unwrap(),
+        )
     }
 }
 
@@ -203,5 +218,25 @@ mod tests {
     #[test]
     fn test_the_angle_between() {
         assert_eq!(the_angle_between(&V1, &V2), 116.02154864365895);
+    }
+    #[test]
+    fn test_vector_addition() {
+        assert_eq!(&Vector([-5.5]) + &Vector([5.5]), Vector([0.0]));
+        assert_eq!(
+            &Vector([-1.0, -1.0]) + &Vector([1.0, 1.0]),
+            Vector([0.0, 0.0])
+        );
+        assert_eq!(
+            &Vector([1.0, 2.0]) + &Vector([3.0, 4.0]),
+            Vector([4.0, 6.0])
+        );
+        assert_eq!(
+            &Vector([1.0, 2.0, 3.0]) + &Vector([4.0, 5.0, 6.0]),
+            Vector([5.0, 7.0, 9.0])
+        );
+        assert_eq!(
+            &(&Vector([1.0, 2.0, 3.0]) + &Vector([4.0, 5.0, 6.0])) + &Vector([7.0, 8.0, 9.0]),
+            Vector([12.0, 15.0, 18.0])
+        );
     }
 }
