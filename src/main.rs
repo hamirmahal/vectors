@@ -289,6 +289,13 @@ mod tests {
             Vector([1.0, 2.0, 3.0]) + Vector([4.0, 5.0, 6.0]) + Vector([7.0, 8.0, 9.0]),
             Vector([12.0, 15.0, 18.0])
         );
+
+        let f1 = Vector([10.0 * cos(30.0), 10.0 * sin(30.0)]);
+        let f2 = Vector([0.0, -40.0]);
+        let f3 = Vector([-5.0, 0.0]);
+        let f4 = Vector([0.0, 2.0]);
+        let f_net = f1 + f2 + f3 + f4;
+        assert_eq!(f_net / 4.0, Vector([0.9150635094610968, -8.25]));
     }
     #[test]
     fn test_vector_division_by_a_scalar() {
