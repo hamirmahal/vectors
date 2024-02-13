@@ -34,20 +34,39 @@ impl<const N: usize> std::fmt::Display for Vector<N> {
         write!(f, "{}", if result.is_empty() { "0i" } else { &result })
     }
 }
-impl<const N: usize> std::ops::Add<Vector<N>> for Vector<N> {
+impl<'a, const N: usize> std::ops::Add<&'a Vector<N>> for &'a Vector<N> {
     type Output = Vector<N>;
-    fn add(self, rhs: Vector<N>) -> Vector<N> {
+    fn add(self, rhs: &'a Vector<N>) -> Vector<N> {
         Vector(
             self.0
                 .iter()
                 .zip(rhs.0.iter())
-                .map(|(&x, &y)| x + y)
+                .map(|(x, y)| x + y)
                 .collect::<Vec<_>>()
                 .try_into()
                 .unwrap(),
         )
     }
 }
+impl<'a, const N: usize> std::ops::Add<Vector<N>> for &'a Vector<N> {
+    type Output = Vector<N>;
+    fn add(self, rhs: Vector<N>) -> Vector<N> {
+        self + &rhs
+    }
+}
+impl<'a, const N: usize> std::ops::Add<&'a Vector<N>> for Vector<N> {
+    type Output = Self;
+    fn add(self, rhs: &'a Vector<N>) -> Self {
+        &self + rhs
+    }
+}
+impl<const N: usize> std::ops::Add for Vector<N> {
+    type Output = Self;
+    fn add(self, rhs: Self) -> Self {
+        &self + &rhs
+    }
+}
+
 impl<const N: usize> std::ops::Div<f64> for Vector<N> {
     type Output = Self;
     fn div(self, rhs: f64) -> Self {
@@ -275,6 +294,7 @@ mod tests {
     }
     #[test]
     fn test_vector_addition() {
+        assert_eq!(&Vector([-5.5]) + &Vector([5.5]), Vector([0.0]));
         assert_eq!(Vector([-5.5]) + Vector([5.5]), Vector([0.0]));
         assert_eq!(
             Vector([-1.0, -1.0]) + Vector([1.0, 1.0]),
@@ -296,6 +316,14 @@ mod tests {
         let f4 = Vector([0.0, 2.0]);
         let f_net = f1 + f2 + f3 + f4;
         assert_eq!(f_net / 4.0, Vector([0.9150635094610968, -8.25]));
+
+        let v1 = Vector([-5.0, 0.0, 0.0]);
+        assert_eq!(&v1 + Vector([0.0, 0.0, 0.0]), v1);
+
+        let v1 = Vector([3.0, -1.0, 4.0]);
+        let v2 = Vector([7.0, 1.0, -5.0]);
+        assert_eq!(v1 + &v2, Vector([10.0, 0.0, -1.0]));
+        assert_eq!(v2, Vector([7.0, 1.0, -5.0]));
     }
     #[test]
     fn test_vector_division_by_a_scalar() {
