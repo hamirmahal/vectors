@@ -314,13 +314,13 @@ mod tests {
     }
     #[test]
     fn test_vector_addition() {
-        assert_eq!(&Vector([-5.5]) + &Vector([5.5]), Vector([0.0]));
         assert_eq!(Vector([-5.5]) + Vector([5.5]), Vector([0.0]));
+        assert_eq!(&Vector([-5.5]) + &Vector([5.5]), Vector([0.0]));
+        assert_eq!(Vector([1.0, 2.0]) + Vector([3.0, 4.0]), Vector([4.0, 6.0]));
         assert_eq!(
             Vector([-1.0, -1.0]) + Vector([1.0, 1.0]),
             Vector([0.0, 0.0])
         );
-        assert_eq!(Vector([1.0, 2.0]) + Vector([3.0, 4.0]), Vector([4.0, 6.0]));
         assert_eq!(
             Vector([1.0, 2.0, 3.0]) + Vector([4.0, 5.0, 6.0]),
             Vector([5.0, 7.0, 9.0])
