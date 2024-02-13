@@ -14,6 +14,11 @@ impl<const N: usize> Vector<N> {
         self.0.iter().zip(v.0.iter()).map(|(a, b)| a * b).sum()
     }
 }
+impl<const N: usize> std::convert::AsRef<Vector<N>> for Vector<N> {
+    fn as_ref(&self) -> &Vector<N> {
+        self
+    }
+}
 impl<const N: usize> std::fmt::Display for Vector<N> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut result = String::new();
@@ -144,8 +149,8 @@ fn inverse_tan(x: f64) -> f64 {
 fn sin(x: f64) -> f64 {
     x.to_radians().sin()
 }
-fn the_magnitude_of<const N: usize>(v: &Vector<N>) -> f64 {
-    f64::sqrt(v.0.iter().map(|x| x.powi(2)).sum())
+fn the_magnitude_of<const N: usize>(v: impl AsRef<Vector<N>>) -> f64 {
+    f64::sqrt(v.as_ref().0.iter().map(|x| x.powi(2)).sum())
 }
 /// This function returns the angle between two vectors in degrees.
 fn the_angle_between<const N: usize>(a: &Vector<N>, b: &Vector<N>) -> f64 {
@@ -169,11 +174,11 @@ mod tests {
         let perpendicular_vectors = [Vector([3.0, -1.0, 4.0]), Vector([7.0, 1.0, -5.0])];
         let there_is_a_floating_point_discrepancy = the_magnitude_of(&perpendicular_vectors[0])
             * the_magnitude_of(&perpendicular_vectors[1])
-            > the_magnitude_of(&perpendicular_vectors[0].cross(&perpendicular_vectors[1]));
+            > the_magnitude_of(perpendicular_vectors[0].cross(&perpendicular_vectors[1]));
         let the_magnitude_of_the_cross_product_of_perpendicular_vectors_is_the_product_of_their_magnitudes =
             (the_magnitude_of(&perpendicular_vectors[0])
                 * the_magnitude_of(&perpendicular_vectors[1])
-                - the_magnitude_of(&perpendicular_vectors[0].cross(&perpendicular_vectors[1])))
+                - the_magnitude_of(perpendicular_vectors[0].cross(&perpendicular_vectors[1])))
                 < 0.00000000000001;
         assert!(the_magnitude_of_the_cross_product_of_perpendicular_vectors_is_the_product_of_their_magnitudes);
         assert!(there_is_a_floating_point_discrepancy);
@@ -287,6 +292,20 @@ mod tests {
             the_magnitude_of(&Vector([1.2000000000000002, 2.8000000000000003])),
             3.0463092423455636
         );
+
+        assert_eq!(the_magnitude_of(Vector([0.0])), 0.0);
+        assert_eq!(the_magnitude_of(Vector([1.0])), 1.0);
+        assert_eq!(the_magnitude_of(Vector([-1.0])), 1.0);
+        assert_eq!(the_magnitude_of(Vector([3.0, 4.0])), 5.0);
+        assert_eq!(the_magnitude_of(Vector([6.0, 8.0])), 10.0);
+        assert_eq!(the_magnitude_of(Vector([3.0, 4.0, 0.0])), 5.0);
+        assert_eq!(the_magnitude_of(Vector([6.0, 8.0, 0.0])), 10.0);
+        assert_eq!(the_magnitude_of(Vector([3.0, 4.0, 0.0, 0.0])), 5.0);
+        assert_eq!(the_magnitude_of(Vector([6.0, 8.0, 0.0, 0.0])), 10.0);
+        assert_eq!(the_magnitude_of(Vector([0.0, 0.0, 3.0, 0.0, 4.0])), 5.0);
+        assert_eq!(the_magnitude_of(Vector([-7.0, 9.0])), 11.40175425099138);
+        assert_eq!(the_magnitude_of(Vector([-3.0, 5.0])), 5.830951894845301);
+        assert_eq!(the_magnitude_of(Vector([10.0, 23.0])), 25.079872407968907);
     }
     #[test]
     fn test_the_angle_between() {
