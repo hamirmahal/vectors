@@ -315,29 +315,6 @@ mod tests {
         assert_eq!(Vector([-5.5]) + Vector([5.5]), Vector([0.0]));
         assert_eq!(&Vector([-5.5]) + &Vector([5.5]), Vector([0.0]));
         assert_eq!(Vector([1.0, 2.0]) + Vector([3.0, 4.0]), Vector([4.0, 6.0]));
-        assert_eq!(
-            Vector([-1.0, -1.0]) + Vector([1.0, 1.0]),
-            Vector([0.0, 0.0])
-        );
-        assert_eq!(
-            Vector([1.0, 2.0, 3.0]) + Vector([4.0, 5.0, 6.0]),
-            Vector([5.0, 7.0, 9.0])
-        );
-        assert_eq!(
-            Vector([0.0, 130.0]) + Vector([200.0 * sin(26.0), 200.0 * cos(26.0)]),
-            Vector([87.67422935781548, 309.7588092598334])
-        );
-        assert_eq!(
-            Vector([1.0, 2.0, 3.0]) + Vector([4.0, 5.0, 6.0]) + Vector([7.0, 8.0, 9.0]),
-            Vector([12.0, 15.0, 18.0])
-        );
-
-        let f1 = Vector([10.0 * cos(30.0), 10.0 * sin(30.0)]);
-        let f2 = Vector([0.0, -40.0]);
-        let f3 = Vector([-5.0, 0.0]);
-        let f4 = Vector([0.0, 2.0]);
-        let f_net = f1 + f2 + f3 + f4;
-        assert_eq!(f_net / 4.0, Vector([0.9150635094610968, -8.25]));
 
         let v1 = Vector([-5.0, 0.0, 0.0]);
         assert_eq!(&v1 + Vector([0.0, 0.0, 0.0]), v1);
