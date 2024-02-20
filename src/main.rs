@@ -312,24 +312,20 @@ mod tests {
     }
     #[test]
     fn test_vector_addition() {
-        assert_eq!(Vector([-5.5]) + Vector([5.5]), Vector([0.0]));
-        assert_eq!(&Vector([-5.5]) + &Vector([5.5]), Vector([0.0]));
-        assert_eq!(Vector([1.0, 2.0]) + Vector([3.0, 4.0]), Vector([4.0, 6.0]));
-
-        let v1 = Vector([-5.0, 0.0, 0.0]);
-        assert_eq!(&v1 + Vector([0.0, 0.0, 0.0]), v1);
-
-        let v1 = Vector([3.0, -1.0, 4.0]);
-        let v2 = Vector([7.0, 1.0, -5.0]);
-        assert_eq!(v1 + &v2, Vector([10.0, 0.0, -1.0]));
-        assert_eq!(v2, Vector([7.0, 1.0, -5.0]));
-
         let f1 = Vector([300.0, 0.0]);
         let f2 = Vector([0.0, 700.0]);
         let f3 = Vector([-500.0, 0.0]);
         let f4 = Vector([0.0, -600.0]);
-        let f_net = f1 + f2 + f3 + f4;
-        assert_eq!(f_net, Vector([-200.0, 100.0]));
+        let v5 = Vector([-5.0, 0.0, 0.0]);
+        let v6 = Vector([3.0, -1.0, 4.0]);
+        let v7 = Vector([7.0, 1.0, -5.0]);
+        assert_eq!(&v5 + Vector([0.0, 0.0, 0.0]), v5);
+        assert_eq!(v6 + &v7, Vector([10.0, 0.0, -1.0]));
+        assert_eq!(v7, Vector([7.0, 1.0, -5.0]));
+        assert_eq!(f1 + f2 + f3 + f4, Vector([-200.0, 100.0]));
+        assert_eq!(Vector([-5.5]) + Vector([5.5]), Vector([0.0]));
+        assert_eq!(&Vector([-5.5]) + &Vector([5.5]), Vector([0.0]));
+        assert_eq!(Vector([1.0, 2.0]) + Vector([3.0, 4.0]), Vector([4.0, 6.0]));
     }
     #[test]
     fn test_vector_division_by_a_scalar() {
