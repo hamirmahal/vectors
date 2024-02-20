@@ -197,9 +197,11 @@ mod tests {
     #[test]
     fn test_inverse_tan() {
         assert_eq!(inverse_tan(1.0), 45.0);
+        assert_eq!(inverse_tan(1.0 / -2.0), -26.56505117707799);
         assert_eq!(inverse_tan(2.80 / 1.20), 66.80140948635182);
         assert_eq!(inverse_tan(87.6 / 309.7), 15.793787773268155);
         assert_eq!(inverse_tan(f64::sqrt(3.0)), 59.99999999999999);
+        assert_eq!(inverse_tan(100.0 / -200.0), -26.56505117707799);
         assert_eq!(inverse_tan(1.0 / f64::sqrt(3.0)), 30.000000000000004);
     }
     #[test]
