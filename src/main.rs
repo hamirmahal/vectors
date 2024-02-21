@@ -114,8 +114,8 @@ fn main() {
 }
 
 /// This function returns the cosine of an angle in degrees.
-fn cos(x: f64) -> f64 {
-    x.to_radians().cos()
+fn cos<T: Into<f64>>(x: T) -> f64 {
+    x.into().to_radians().cos()
 }
 fn get_centripetal_acceleration(v: f64, r: f64) -> f64 {
     v.powi(2) / r
@@ -146,8 +146,8 @@ fn inverse_tan(x: f64) -> f64 {
     x.atan().to_degrees()
 }
 /// This function returns the sine of an angle in degrees.
-fn sin(x: f64) -> f64 {
-    x.to_radians().sin()
+fn sin<T: Into<f64>>(x: T) -> f64 {
+    x.into().to_radians().sin()
 }
 fn the_magnitude_of<const N: usize>(v: impl AsRef<Vector<N>>) -> f64 {
     f64::sqrt(v.as_ref().0.iter().map(|x| x.powi(2)).sum())
@@ -191,9 +191,11 @@ mod tests {
     #[test]
     fn test_cos() {
         assert_eq!(cos(29.0) * 17000.0, 14868.535021369727);
+        assert_eq!(cos(29) * 17000.0, 14868.535021369727);
         assert_eq!(cos(30.0), 0.8660254037844387);
         assert_eq!(cos(45.0), std::f64::consts::FRAC_1_SQRT_2);
         assert_eq!(cos(60.0), 0.5000000000000001);
+        assert_eq!(cos(60), 0.5000000000000001);
     }
     #[test]
     fn test_inverse_tan() {
@@ -271,8 +273,10 @@ mod tests {
     #[test]
     fn test_sin() {
         assert_eq!(sin(29.0) * 17000.0, 8241.76354418773);
+        assert_eq!(sin(29) * 17000.0, 8241.76354418773);
         assert_eq!(sin(30.0), 0.49999999999999994);
         assert_eq!(sin(45.0), 0.7071067811865475);
+        assert_eq!(sin(45), 0.7071067811865475);
         assert_eq!(sin(60.0), f64::sqrt(3.0) / 2.0);
     }
     #[test]
