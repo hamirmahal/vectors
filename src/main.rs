@@ -185,6 +185,7 @@ mod tests {
     }
     #[test]
     fn test_centripetal_acceleration() {
+        assert_eq!(get_centripetal_acceleration(25.0, 500.0), 1.25);
         assert_eq!(get_centripetal_acceleration(20.0, 14.9), 26.845637583892618);
     }
     #[test]
