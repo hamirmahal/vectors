@@ -185,7 +185,11 @@ mod tests {
     }
     #[test]
     fn test_centripetal_acceleration() {
+        let r = 73.0;
+        let rev_per_s = 0.5;
+        let v = rev_per_s * 2.0 * std::f64::consts::PI * r;
         assert_eq!(get_centripetal_acceleration(25.0, 500.0), 1.25);
+        assert_eq!(get_centripetal_acceleration(v, r), 720.481121279523);
         assert_eq!(get_centripetal_acceleration(20.0, 14.9), 26.845637583892618);
     }
     #[test]
