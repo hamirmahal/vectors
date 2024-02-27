@@ -117,8 +117,8 @@ fn main() {
 fn cos<T: Into<f64>>(x: T) -> f64 {
     x.into().to_radians().cos()
 }
-fn get_centripetal_acceleration(v: f64, r: f64) -> f64 {
-    v.powi(2) / r
+fn get_centripetal_acceleration(v: impl Into<f64>, r: impl Into<f64>) -> f64 {
+    v.into().powi(2) / r.into()
 }
 fn get_net_force_using<const N: usize>(m_in_kg: f64, a_in_m_per_s2: Vector<N>) -> Vector<N> {
     Vector(
@@ -188,8 +188,10 @@ mod tests {
         let r = 73.0;
         let rev_per_s = 0.5;
         let v = rev_per_s * 2.0 * std::f64::consts::PI * r;
+        assert_eq!(get_centripetal_acceleration(25, 500), 1.25);
         assert_eq!(get_centripetal_acceleration(25.0, 500.0), 1.25);
         assert_eq!(get_centripetal_acceleration(v, r), 720.481121279523);
+        assert_eq!(get_centripetal_acceleration(20, 14.9), 26.845637583892618);
         assert_eq!(get_centripetal_acceleration(20.0, 14.9), 26.845637583892618);
     }
     #[test]
