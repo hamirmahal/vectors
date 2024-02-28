@@ -202,6 +202,7 @@ mod tests {
         assert_eq!(cos(45.0), std::f64::consts::FRAC_1_SQRT_2);
         assert_eq!(cos(60.0), 0.5000000000000001);
         assert_eq!(cos(60), 0.5000000000000001);
+        assert_eq!(cos(60), cos(-60));
     }
     #[test]
     fn test_inverse_tan() {
