@@ -276,8 +276,13 @@ mod tests {
     #[test]
     fn test_quadratic_equation() {
         assert_eq!(quadratic_equation(9.0, -126.0, 441.0), (7.0, 7.0));
+        assert_eq!(quadratic_equation(1, 1, -6), (2.0, -3.0));
         assert_eq!(quadratic_equation(1, 1, 0), (0.0, -1.0));
         assert_eq!(quadratic_equation(1, 0, 0), (0.0, 0.0));
+        assert_eq!(
+            quadratic_equation(3.1725, -39.4875, 121.214),
+            (6.946617853705707, 5.50019065693259),
+        );
     }
     #[test]
     fn test_sin() {
