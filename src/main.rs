@@ -137,7 +137,10 @@ fn cos<T: Into<f64>>(x: T) -> f64 {
 fn get_centripetal_acceleration(v: impl Into<f64>, r: impl Into<f64>) -> f64 {
     v.into().powi(2) / r.into()
 }
-fn quadratic_equation(a: f64, b: f64, c: f64) -> (f64, f64) {
+fn quadratic_equation(a: impl Into<f64>, b: impl Into<f64>, c: impl Into<f64>) -> (f64, f64) {
+    let a = a.into();
+    let b = b.into();
+    let c = c.into();
     (
         (-b + f64::sqrt(b.powi(2) - 4.0 * a * c)) / (2.0 * a),
         (-b - f64::sqrt(b.powi(2) - 4.0 * a * c)) / (2.0 * a),
@@ -273,6 +276,8 @@ mod tests {
     #[test]
     fn test_quadratic_equation() {
         assert_eq!(quadratic_equation(9.0, -126.0, 441.0), (7.0, 7.0));
+        assert_eq!(quadratic_equation(1, 1, 0), (0.0, -1.0));
+        assert_eq!(quadratic_equation(1, 0, 0), (0.0, 0.0));
     }
     #[test]
     fn test_sin() {
