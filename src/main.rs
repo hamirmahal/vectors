@@ -106,9 +106,12 @@ impl<const N: usize> std::ops::Mul<Vector<N>> for f64 {
 }
 
 fn main() {
+    let m = [0.02; 6];
+    let r = [25, 15, 5, 5, 15, 25].map(|x| x as f64 / 100.0);
     let f1 = Vector([10.0, -20.4, 2.0]);
     let f2 = Vector([-15.0, 0.0, -6.2]);
     let result = quadratic_equation(9.0, -126.0, 441.0);
+    let inertia = the_moment_of_inertia_of(&m, &r);
     let the_angle_between_f1_and_f2 = the_angle_between(&f1, &f2);
     let centripetal_acceleration = get_centripetal_acceleration(20.0, 14.9);
     let v_x = cos(29.0) * 17000.0;
@@ -119,6 +122,7 @@ fn main() {
     println!("The magnitude of f1 is {}", the_magnitude_of(&f1));
     println!("The magnitude of f2 is {}", the_magnitude_of(&f2));
     println!("The roots of the equation are {:?}", result);
+    println!("The moment of inertia is {}", inertia);
     println!("f1 cross f2 is {}", f1.cross(&f2));
     println!(
         "The angle between f1 and f2 is {} degrees",
@@ -160,6 +164,13 @@ fn sin<T: Into<f64>>(x: T) -> f64 {
 }
 fn the_magnitude_of<const N: usize>(v: impl AsRef<Vector<N>>) -> f64 {
     f64::sqrt(v.as_ref().0.iter().map(|x| x.powi(2)).sum())
+}
+fn the_moment_of_inertia_of<const N: usize>(masses_in_kg: &[f64; N], radii_in_m: &[f64; N]) -> f64 {
+    masses_in_kg
+        .iter()
+        .zip(radii_in_m.iter())
+        .map(|(&m, &r)| m * r.powi(2))
+        .sum()
 }
 /// This function returns the angle between two vectors in degrees.
 fn the_angle_between<const N: usize>(a: &Vector<N>, b: &Vector<N>) -> f64 {
@@ -326,6 +337,12 @@ mod tests {
         assert_eq!(the_magnitude_of(Vector([-7.0, 9.0])), 11.40175425099138);
         assert_eq!(the_magnitude_of(Vector([-3.0, 5.0])), 5.830951894845301);
         assert_eq!(the_magnitude_of(Vector([10.0, 23.0])), 25.079872407968907);
+    }
+    #[test]
+    fn test_the_moment_of_inertia_of() {
+        let m = [0.02; 6];
+        let r = [0.25, 0.15, 0.05, 0.05, 0.15, 0.25];
+        assert_eq!(the_moment_of_inertia_of(&m, &r), 0.0034999999999999996);
     }
     #[test]
     fn test_the_angle_between() {
