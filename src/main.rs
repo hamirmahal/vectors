@@ -340,12 +340,12 @@ mod tests {
     }
     #[test]
     fn test_the_moment_of_inertia_of() {
-        let m = [0.02; 6];
         let r0 = [4.into(); 4];
         let m0 = [50.into(); 4];
-        let r = [0.25, 0.15, 0.05, 0.05, 0.15, 0.25];
+        let m1 = [0.02, 0.02, 0.02, 0.02, 0.02, 0.02];
+        let r1 = [0.25, 0.15, 0.05, 0.05, 0.15, 0.25];
         assert_eq!(the_moment_of_inertia_of(&m0, &r0), 3200.into());
-        assert_eq!(the_moment_of_inertia_of(&m, &r), 0.0034999999999999996);
+        assert_eq!(the_moment_of_inertia_of(&m1, &r1), 0.0034999999999999996);
     }
     #[test]
     fn test_the_angle_between() {
