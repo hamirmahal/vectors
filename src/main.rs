@@ -116,7 +116,9 @@ fn main() {
     let centripetal_acceleration = get_centripetal_acceleration(20.0, 14.9);
     let v_x = cos(29.0) * 17000.0;
     let v_y = sin(29.0) * 17000.0;
-    dbg!(inverse_tan(2.80 / 1.20));
+    let i = inverse_tan(2.0);
+    let t = tan(i);
+    dbg!(t);
     dbg!(v_x);
     dbg!(v_y);
     println!("The magnitude of f1 is {}", the_magnitude_of(&f1));
@@ -161,6 +163,10 @@ fn inverse_tan(x: f64) -> f64 {
 /// This function returns the sine of an angle in degrees.
 fn sin<T: Into<f64>>(x: T) -> f64 {
     x.into().to_radians().sin()
+}
+/// This function returns the tangent of an angle in degrees.
+fn tan<T: Into<f64>>(x: T) -> f64 {
+    x.into().to_radians().tan()
 }
 fn the_magnitude_of<const N: usize>(v: impl AsRef<Vector<N>>) -> f64 {
     f64::sqrt(v.as_ref().0.iter().map(|x| x.powi(2)).sum())
@@ -303,6 +309,14 @@ mod tests {
         assert_eq!(sin(45.0), 0.7071067811865475);
         assert_eq!(sin(45), 0.7071067811865475);
         assert_eq!(sin(60.0), f64::sqrt(3.0) / 2.0);
+    }
+    #[test]
+    fn test_tan() {
+        assert_eq!(tan(29), 0.554309051452769);
+        assert_eq!(tan(29.0), 0.554309051452769);
+        assert_eq!(tan(30.0), 0.5773502691896257);
+        assert_eq!(tan(45.0), 0.9999999999999999);
+        assert_eq!(tan(60.0), 1.7320508075688767);
     }
     #[test]
     fn test_the_magnitude_of() {
