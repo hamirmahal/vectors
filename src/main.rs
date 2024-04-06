@@ -136,9 +136,8 @@ fn main() {
     );
 }
 
-/// This function returns the cosine of an angle in degrees.
-fn cos<T: Into<f64>>(x: T) -> f64 {
-    x.into().to_radians().cos()
+fn cos<T: Into<f64>>(degrees: T) -> f64 {
+    degrees.into().to_radians().cos()
 }
 fn get_centripetal_acceleration(v: impl Into<f64>, r: impl Into<f64>) -> f64 {
     v.into().powi(2) / r.into()
@@ -160,13 +159,11 @@ fn inverse_cosine(x: f64) -> f64 {
 fn inverse_tan(x: f64) -> f64 {
     x.atan().to_degrees()
 }
-/// This function returns the sine of an angle in degrees.
-fn sin<T: Into<f64>>(x: T) -> f64 {
-    x.into().to_radians().sin()
+fn sin<T: Into<f64>>(degrees: T) -> f64 {
+    degrees.into().to_radians().sin()
 }
-/// This function returns the tangent of an angle in degrees.
-fn tan<T: Into<f64>>(x: T) -> f64 {
-    x.into().to_radians().tan()
+fn tan<T: Into<f64>>(degrees: T) -> f64 {
+    degrees.into().to_radians().tan()
 }
 fn the_magnitude_of<const N: usize>(v: impl AsRef<Vector<N>>) -> f64 {
     f64::sqrt(v.as_ref().0.iter().map(|x| x.powi(2)).sum())
