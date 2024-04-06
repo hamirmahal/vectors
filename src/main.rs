@@ -136,7 +136,7 @@ fn main() {
     );
 }
 
-fn cos<T: Into<f64>>(degrees: T) -> f64 {
+fn cos(degrees: impl Into<f64>) -> f64 {
     degrees.into().to_radians().cos()
 }
 fn get_centripetal_acceleration(v: impl Into<f64>, r: impl Into<f64>) -> f64 {
@@ -159,10 +159,10 @@ fn inverse_cosine(x: f64) -> f64 {
 fn inverse_tan(x: f64) -> f64 {
     x.atan().to_degrees()
 }
-fn sin<T: Into<f64>>(degrees: T) -> f64 {
+fn sin(degrees: impl Into<f64>) -> f64 {
     degrees.into().to_radians().sin()
 }
-fn tan<T: Into<f64>>(degrees: T) -> f64 {
+fn tan(degrees: impl Into<f64>) -> f64 {
     degrees.into().to_radians().tan()
 }
 fn the_magnitude_of<const N: usize>(v: impl AsRef<Vector<N>>) -> f64 {
