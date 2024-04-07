@@ -121,6 +121,7 @@ fn main() {
     dbg!(t);
     dbg!(v_x);
     dbg!(v_y);
+    dbg!(sqrt(3.0));
     println!("The magnitude of f1 is {}", the_magnitude_of(&f1));
     println!("The magnitude of f2 is {}", the_magnitude_of(&f2));
     println!("The roots of the equation are {:?}", result);
@@ -161,6 +162,9 @@ fn inverse_tan(x: f64) -> f64 {
 }
 fn sin(degrees: impl Into<f64>) -> f64 {
     degrees.into().to_radians().sin()
+}
+fn sqrt(x: impl Into<f64>) -> f64 {
+    x.into().sqrt()
 }
 fn tan(degrees: impl Into<f64>) -> f64 {
     degrees.into().to_radians().tan()
@@ -306,6 +310,19 @@ mod tests {
         assert_eq!(sin(45.0), 0.7071067811865475);
         assert_eq!(sin(45), 0.7071067811865475);
         assert_eq!(sin(60.0), f64::sqrt(3.0) / 2.0);
+    }
+    #[test]
+    fn test_sqrt() {
+        assert_eq!(sqrt(0), 0.0);
+        assert_eq!(sqrt(1), 1.0);
+        assert_eq!(sqrt(1.0), 1.0);
+        assert_eq!(sqrt(2), std::f64::consts::SQRT_2);
+        assert_eq!(sqrt(2.0), std::f64::consts::SQRT_2);
+        assert_eq!(sqrt(3.0), f64::sqrt(3.0));
+        assert_eq!(sqrt(3), f64::sqrt(3.0));
+        assert_eq!(sqrt(4.0), 2.0);
+        assert_eq!(sqrt(4), 2.0);
+        assert_eq!(sqrt(9), 3.0);
     }
     #[test]
     fn test_tan() {
