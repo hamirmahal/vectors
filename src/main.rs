@@ -198,17 +198,18 @@ mod tests {
 
     #[test]
     fn test_cross() {
-        let perpendicular_vectors = [Vector([3.0, -1.0, 4.0]), Vector([7.0, 1.0, -5.0])];
-        let there_is_a_floating_point_discrepancy = the_magnitude_of(&perpendicular_vectors[0])
-            * the_magnitude_of(&perpendicular_vectors[1])
-            > the_magnitude_of(perpendicular_vectors[0].cross(&perpendicular_vectors[1]));
-        let the_magnitude_of_the_cross_product_of_perpendicular_vectors_is_the_product_of_their_magnitudes =
-            (the_magnitude_of(&perpendicular_vectors[0])
-                * the_magnitude_of(&perpendicular_vectors[1])
-                - the_magnitude_of(perpendicular_vectors[0].cross(&perpendicular_vectors[1])))
-                < 0.00000000000001;
-        assert!(the_magnitude_of_the_cross_product_of_perpendicular_vectors_is_the_product_of_their_magnitudes);
-        assert!(there_is_a_floating_point_discrepancy);
+        assert_eq!(
+            Vector([-2.0, 1.0, 0.0]).cross(&Vector([0.0, 8.0, 0.0])),
+            Vector([0.0, 0.0, -16.0])
+        );
+        assert_eq!(
+            Vector([4.0, 1.0, 0.0]).cross(&Vector([20.0, 0.0, 0.0])),
+            Vector([0.0, 0.0, -20.0])
+        );
+        assert_eq!(
+            Vector([2.0, -2.0, 0.0]).cross(&Vector([3.0, 0.0, 0.0])),
+            Vector([0.0, 0.0, 6.0])
+        );
     }
     #[test]
     fn test_centripetal_acceleration() {
