@@ -1,7 +1,26 @@
+trait MyNum:
+    Copy
+    + num_traits::Signed
+    + std::cmp::PartialOrd
+    + std::fmt::Debug
+    + std::fmt::Display
+    + std::iter::Sum
+{
+}
+impl<T> MyNum for T where
+    T: Copy
+        + num_traits::Signed
+        + std::cmp::PartialOrd
+        + std::fmt::Debug
+        + std::fmt::Display
+        + std::iter::Sum
+{
+}
+
 #[derive(Debug, PartialEq)]
-struct Vector<const N: usize>([f64; N]);
-impl Vector<3> {
-    fn cross(&self, b: &Vector<3>) -> Vector<3> {
+struct Vector<const N: usize, T: MyNum>([T; N]);
+impl<T: MyNum> Vector<3, T> {
+    fn cross(&self, b: &Vector<3, T>) -> Vector<3, T> {
         Vector([
             self.0[1] * b.0[2] - self.0[2] * b.0[1],
             self.0[2] * b.0[0] - self.0[0] * b.0[2],
@@ -9,28 +28,28 @@ impl Vector<3> {
         ])
     }
 }
-impl<const N: usize> Vector<N> {
-    fn dot(&self, v: &Vector<N>) -> f64 {
-        self.0.iter().zip(v.0.iter()).map(|(a, b)| a * b).sum()
+impl<const N: usize, T: MyNum> Vector<N, T> {
+    fn dot(&self, v: &Vector<N, T>) -> T {
+        self.0.iter().zip(v.0.iter()).map(|(&a, &b)| a * b).sum()
     }
 }
-impl<const N: usize> std::convert::AsRef<Vector<N>> for Vector<N> {
-    fn as_ref(&self) -> &Vector<N> {
+impl<const N: usize, T: MyNum> std::convert::AsRef<Vector<N, T>> for Vector<N, T> {
+    fn as_ref(&self) -> &Vector<N, T> {
         self
     }
 }
-impl<const N: usize> std::fmt::Display for Vector<N> {
+impl<const N: usize, T: MyNum> std::fmt::Display for Vector<N, T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut result = String::new();
         self.0.iter().enumerate().for_each(|(i, &x)| {
-            if x != 0.0 {
+            if x != T::zero() {
                 result.push_str(if result.is_empty() { "" } else { " " });
-                if x < 0.0 {
+                if x < T::zero() {
                     result.push_str("- ");
                 } else if !result.is_empty() {
                     result.push_str("+ ");
                 }
-                if x.abs() != 1.0 {
+                if x.abs() != T::one() {
                     result.push_str(&x.abs().to_string());
                 }
                 result.push((b'i' + i as u8) as char);
@@ -39,42 +58,42 @@ impl<const N: usize> std::fmt::Display for Vector<N> {
         write!(f, "{}", if result.is_empty() { "0i" } else { &result })
     }
 }
-impl<'a, const N: usize> std::ops::Add<&'a Vector<N>> for &'a Vector<N> {
-    type Output = Vector<N>;
-    fn add(self, rhs: &'a Vector<N>) -> Vector<N> {
+impl<'a, const N: usize, T: MyNum> std::ops::Add<&'a Vector<N, T>> for &'a Vector<N, T> {
+    type Output = Vector<N, T>;
+    fn add(self, rhs: &'a Vector<N, T>) -> Vector<N, T> {
         Vector(
             self.0
                 .iter()
                 .zip(rhs.0.iter())
-                .map(|(x, y)| x + y)
+                .map(|(&x, &y)| x + y)
                 .collect::<Vec<_>>()
                 .try_into()
                 .unwrap(),
         )
     }
 }
-impl<'a, const N: usize> std::ops::Add<Vector<N>> for &'a Vector<N> {
-    type Output = Vector<N>;
-    fn add(self, rhs: Vector<N>) -> Vector<N> {
+impl<'a, const N: usize, T: MyNum> std::ops::Add<Vector<N, T>> for &'a Vector<N, T> {
+    type Output = Vector<N, T>;
+    fn add(self, rhs: Vector<N, T>) -> Vector<N, T> {
         self + &rhs
     }
 }
-impl<'a, const N: usize> std::ops::Add<&'a Vector<N>> for Vector<N> {
+impl<'a, const N: usize, T: MyNum> std::ops::Add<&'a Vector<N, T>> for Vector<N, T> {
     type Output = Self;
-    fn add(self, rhs: &'a Vector<N>) -> Self {
+    fn add(self, rhs: &'a Vector<N, T>) -> Self {
         &self + rhs
     }
 }
-impl<const N: usize> std::ops::Add for Vector<N> {
+impl<const N: usize, T: MyNum> std::ops::Add for Vector<N, T> {
     type Output = Self;
     fn add(self, rhs: Self) -> Self {
         &self + &rhs
     }
 }
 
-impl<const N: usize> std::ops::Div<f64> for Vector<N> {
+impl<const N: usize, T: MyNum> std::ops::Div<T> for Vector<N, T> {
     type Output = Self;
-    fn div(self, rhs: f64) -> Self {
+    fn div(self, rhs: T) -> Self {
         Vector(
             self.0
                 .iter()
@@ -85,9 +104,9 @@ impl<const N: usize> std::ops::Div<f64> for Vector<N> {
         )
     }
 }
-impl<const N: usize> std::ops::Mul<f64> for Vector<N> {
+impl<const N: usize, T: MyNum> std::ops::Mul<T> for Vector<N, T> {
     type Output = Self;
-    fn mul(self, rhs: f64) -> Self {
+    fn mul(self, rhs: T) -> Self {
         Vector(
             self.0
                 .iter()
@@ -98,10 +117,10 @@ impl<const N: usize> std::ops::Mul<f64> for Vector<N> {
         )
     }
 }
-impl<const N: usize> std::ops::Mul<Vector<N>> for f64 {
-    type Output = Vector<N>;
-    fn mul(self, rhs: Vector<N>) -> Vector<N> {
-        rhs * self
+impl<const N: usize, T: MyNum + std::convert::From<f64>> std::ops::Mul<Vector<N, T>> for f64 {
+    type Output = Vector<N, T>;
+    fn mul(self, rhs: Vector<N, T>) -> Vector<N, T> {
+        rhs * self.into()
     }
 }
 
@@ -112,7 +131,6 @@ fn main() {
     let f2 = Vector([-15.0, 0.0, -6.2]);
     let result = quadratic_equation(9.0, -126.0, 441.0);
     let inertia = the_moment_of_inertia_of(&m, &r);
-    let the_angle_between_f1_and_f2 = the_angle_between(&f1, &f2);
     let centripetal_acceleration = get_centripetal_acceleration(20.0, 14.9);
     let v_x = cos(29.0) * 17000.0;
     let v_y = sin(29.0) * 17000.0;
@@ -127,10 +145,6 @@ fn main() {
     println!("The roots of the equation are {:?}", result);
     println!("The moment of inertia is {}", inertia);
     println!("f1 cross f2 is {}", f1.cross(&f2));
-    println!(
-        "The angle between f1 and f2 is {} degrees",
-        the_angle_between_f1_and_f2
-    );
     println!(
         "The centripetal acceleration is {}",
         centripetal_acceleration
@@ -152,10 +166,6 @@ fn quadratic_equation(a: impl Into<f64>, b: impl Into<f64>, c: impl Into<f64>) -
         (-b - f64::sqrt(b.powi(2) - 4.0 * a * c)) / (2.0 * a),
     )
 }
-/// This function returns the inverse cosine of a number in degrees.
-fn inverse_cosine(x: f64) -> f64 {
-    x.acos().to_degrees()
-}
 /// This function returns the inverse tangent of a number in degrees.
 fn inverse_tan(x: f64) -> f64 {
     x.atan().to_degrees()
@@ -169,28 +179,29 @@ fn sqrt(x: impl Into<f64>) -> f64 {
 fn tan(degrees: impl Into<f64>) -> f64 {
     degrees.into().to_radians().tan()
 }
-fn the_magnitude_of<const N: usize>(v: impl AsRef<Vector<N>>) -> f64 {
-    f64::sqrt(v.as_ref().0.iter().map(|x| x.powi(2)).sum())
+fn the_magnitude_of<const N: usize, T: MyNum>(v: impl AsRef<Vector<N, T>>) -> f64
+where
+    f64: std::iter::Sum<T>,
+{
+    f64::sqrt(v.as_ref().0.iter().map(|&x| x * x).sum())
 }
-fn the_moment_of_inertia_of<const N: usize>(masses_in_kg: &[f64; N], radii_in_m: &[f64; N]) -> f64 {
+fn the_moment_of_inertia_of<const N: usize, T: MyNum>(
+    masses_in_kg: &[T; N],
+    radii_in_m: &[T; N],
+) -> T {
     masses_in_kg
         .iter()
         .zip(radii_in_m.iter())
-        .map(|(&m, &r)| m * r.powi(2))
+        .map(|(&m, &r)| m * r * r)
         .sum()
-}
-/// This function returns the angle between two vectors in degrees.
-fn the_angle_between<const N: usize>(a: &Vector<N>, b: &Vector<N>) -> f64 {
-    let cos_of_angle = a.dot(b) / (the_magnitude_of(a) * the_magnitude_of(b));
-    inverse_cosine(cos_of_angle)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    const V1: Vector<3> = Vector([10.0, -20.4, 2.0]);
-    const V2: Vector<3> = Vector([-15.0, 0.0, -6.2]);
-    fn verify<const N: usize>(expected_output: &[(Vector<N>, &str)]) {
+    const V1: Vector<3, f64> = Vector([10.0, -20.4, 2.0]);
+    const V2: Vector<3, f64> = Vector([-15.0, 0.0, -6.2]);
+    fn verify<const N: usize, T: MyNum>(expected_output: &[(Vector<N, T>, &str)]) {
         expected_output
             .iter()
             .for_each(|(v, expected)| assert_eq!(format!("{}", v), *expected));
@@ -369,16 +380,12 @@ mod tests {
     }
     #[test]
     fn test_the_moment_of_inertia_of() {
-        let r0 = [4.into(); 4];
-        let m0 = [50.into(); 4];
+        let r0 = [4; 4];
+        let m0 = [50; 4];
         let m1 = [0.02, 0.02, 0.02, 0.02, 0.02, 0.02];
         let r1 = [0.25, 0.15, 0.05, 0.05, 0.15, 0.25];
-        assert_eq!(the_moment_of_inertia_of(&m0, &r0), 3200.into());
+        assert_eq!(the_moment_of_inertia_of(&m0, &r0), 3200);
         assert_eq!(the_moment_of_inertia_of(&m1, &r1), 0.0034999999999999996);
-    }
-    #[test]
-    fn test_the_angle_between() {
-        assert_eq!(the_angle_between(&V1, &V2), 116.02154864365895);
     }
     #[test]
     fn test_vector_addition() {
