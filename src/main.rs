@@ -105,6 +105,15 @@ impl<const N: usize> std::ops::Mul<Vector<N>> for f64 {
     }
 }
 
+trait Pow {
+    fn pow(self, n: i32) -> Self;
+}
+impl Pow for f64 {
+    fn pow(self, n: i32) -> Self {
+        self.powi(n)
+    }
+}
+
 fn main() {
     let m = [0.02; 6];
     let r = [25, 15, 5, 5, 15, 25].map(|x| x as f64 / 100.0);
@@ -122,6 +131,7 @@ fn main() {
     dbg!(v_x);
     dbg!(v_y);
     dbg!(sqrt(3.0));
+    println!("2^3 = {}", 2.0.pow(3));
     println!("The magnitude of f1 is {}", the_magnitude_of(&f1));
     println!("The magnitude of f2 is {}", the_magnitude_of(&f2));
     println!("The roots of the equation are {:?}", result);
@@ -302,6 +312,27 @@ mod tests {
             quadratic_equation(3.1725, -39.4875, 121.214),
             (6.946617853705707, 5.50019065693259),
         );
+    }
+    #[test]
+    fn test_pow() {
+        assert_eq!(2.0.pow(3), 8.0);
+        assert_eq!(2.0.pow(2), 4.0);
+        assert_eq!(2.0.pow(1), 2.0);
+        assert_eq!(0.0.pow(0), 1.0);
+        assert_eq!(2.0.pow(-1), 0.5);
+        assert_eq!(2.0.pow(-2), 0.25);
+        assert_eq!(2.0.pow(-3), 0.125);
+        assert_eq!((-1.0).pow(0), 1.0);
+        assert_eq!((-1.0).pow(-1), -1.0);
+        assert_eq!((-2.0).pow(-1), -0.5);
+        assert_eq!((-2.0).pow(-2), 0.25);
+        assert_eq!((-2.0).pow(-3), -0.125);
+        assert_eq!((-2.0).pow(-4), 0.0625);
+        assert_eq!((-2.0).pow(-5), -0.03125);
+        assert_eq!((-2.0).pow(-6), 0.015625);
+        assert_eq!((-2.0).pow(-7), -0.0078125);
+        assert_eq!((-2.0).pow(-8), 0.00390625);
+        assert_eq!(0.0.pow(-1), f64::INFINITY);
     }
     #[test]
     fn test_sin() {
