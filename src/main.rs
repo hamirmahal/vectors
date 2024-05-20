@@ -247,6 +247,8 @@ mod tests {
     }
     #[test]
     fn test_cos() {
+        assert_approx_eq!(cos(0), 1.0);
+        assert_approx_eq!(cos(0.0), 1.0);
         assert_approx_eq!(cos(30), 0.866_025_403_784_438_7);
         assert_approx_eq!(cos(30.0), 0.866_025_403_784_438_7);
         assert_approx_eq!(cos(45), std::f64::consts::FRAC_1_SQRT_2);
@@ -254,6 +256,7 @@ mod tests {
         assert_approx_eq!(cos(60.0), cos(-60));
         assert_approx_eq!(cos(60), cos(-60));
         assert_approx_eq!(cos(60), 0.5);
+        assert_approx_eq!(cos(90), 0.0);
     }
     #[test]
     fn test_inverse_tan() {
