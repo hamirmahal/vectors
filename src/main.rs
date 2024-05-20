@@ -1,3 +1,4 @@
+#![warn(clippy::pedantic)]
 #[derive(Debug, PartialEq)]
 struct Vector<const N: usize>([f64; N]);
 impl Vector<3> {
@@ -30,10 +31,10 @@ impl<const N: usize> std::fmt::Display for Vector<N> {
                 } else if !result.is_empty() {
                     result.push_str("+ ");
                 }
-                if x.abs() != 1.0 {
+                if (x.abs() - 1.0).abs() > f64::EPSILON {
                     result.push_str(&x.abs().to_string());
                 }
-                result.push((b'i' + i as u8) as char);
+                result.push((b'i' + u8::try_from(i).unwrap()) as char);
             }
         });
         write!(f, "{}", if result.is_empty() { "0i" } else { &result })
@@ -116,7 +117,7 @@ impl Pow for f64 {
 
 fn main() {
     let m = [0.02; 6];
-    let r = [25, 15, 5, 5, 15, 25].map(|x| x as f64 / 100.0);
+    let r = [25, 15, 5, 5, 15, 25].map(|x| f64::from(x) / 100.0);
     let f1 = Vector([10.0, -20.4, 2.0]);
     let f2 = Vector([-15.0, 0.0, -6.2]);
     let result = quadratic_equation(9.0, -126.0, 441.0);
@@ -134,17 +135,11 @@ fn main() {
     println!("2^3 = {}", 2.0.pow(3));
     println!("The magnitude of f1 is {}", the_magnitude_of(&f1));
     println!("The magnitude of f2 is {}", the_magnitude_of(&f2));
-    println!("The roots of the equation are {:?}", result);
-    println!("The moment of inertia is {}", inertia);
+    println!("The angle between f1 and f2 is {the_angle_between_f1_and_f2} degrees");
+    println!("The centripetal acceleration is {centripetal_acceleration}");
+    println!("The roots of the equation are {result:?}");
+    println!("The moment of inertia is {inertia}");
     println!("f1 cross f2 is {}", f1.cross(&f2));
-    println!(
-        "The angle between f1 and f2 is {} degrees",
-        the_angle_between_f1_and_f2
-    );
-    println!(
-        "The centripetal acceleration is {}",
-        centripetal_acceleration
-    );
 }
 
 fn cos(degrees: impl Into<f64>) -> f64 {
@@ -203,7 +198,25 @@ mod tests {
     fn verify<const N: usize>(expected_output: &[(Vector<N>, &str)]) {
         expected_output
             .iter()
-            .for_each(|(v, expected)| assert_eq!(format!("{}", v), *expected));
+            .for_each(|(v, expected)| assert_eq!(format!("{v}"), *expected));
+    }
+    macro_rules! assert_approx_eq {
+        ($a:expr, $b:expr, $eps:expr) => {{
+            let (a, b) = ($a, $b);
+            let eps = $eps;
+            assert!(
+                (a - b).abs() < eps || (a.is_infinite() && b.is_infinite()),
+                "assertion failed: `(left !== right)` \
+                 (left: `{:?}`, right: `{:?}`, expect diff: `{:?}`, real diff: `{:?}`)",
+                a,
+                b,
+                eps,
+                (a - b).abs()
+            );
+        }};
+        ($a:expr, $b:expr) => {
+            assert_approx_eq!($a, $b, 1.0e-12)
+        };
     }
 
     #[test]
@@ -226,31 +239,30 @@ mod tests {
         let r = 73.0;
         let rev_per_s = 0.5;
         let v = rev_per_s * 2.0 * std::f64::consts::PI * r;
-        assert_eq!(get_centripetal_acceleration(25, 500), 1.25);
-        assert_eq!(get_centripetal_acceleration(25.0, 500.0), 1.25);
-        assert_eq!(get_centripetal_acceleration(v, r), 720.481121279523);
-        assert_eq!(get_centripetal_acceleration(20, 14.9), 26.845637583892618);
-        assert_eq!(get_centripetal_acceleration(20.0, 14.9), 26.845637583892618);
+        assert_approx_eq!(get_centripetal_acceleration(25, 500), 1.25);
+        assert_approx_eq!(get_centripetal_acceleration(25.0, 500.0), 1.25);
+        assert_approx_eq!(get_centripetal_acceleration(v, r), 720.481_121_279_523);
+        assert_approx_eq!(get_centripetal_acceleration(20, 14.9), 26.845_637_583_892_6);
+        assert_approx_eq!(get_centripetal_acceleration(20.0, 14.9), 26.845_637_583_892);
     }
     #[test]
     fn test_cos() {
-        assert_eq!(cos(29.0) * 17000.0, 14868.535021369727);
-        assert_eq!(cos(29) * 17000.0, 14868.535021369727);
-        assert_eq!(cos(30.0), 0.8660254037844387);
-        assert_eq!(cos(45.0), std::f64::consts::FRAC_1_SQRT_2);
-        assert_eq!(cos(60.0), 0.5000000000000001);
-        assert_eq!(cos(60), 0.5000000000000001);
-        assert_eq!(cos(60), cos(-60));
+        assert_approx_eq!(cos(30), 0.866_025_403_784_438_7);
+        assert_approx_eq!(cos(30.0), 0.866_025_403_784_438_7);
+        assert_approx_eq!(cos(45), std::f64::consts::FRAC_1_SQRT_2);
+        assert_approx_eq!(cos(45.0), std::f64::consts::FRAC_1_SQRT_2);
+        assert_approx_eq!(cos(60.0), cos(-60));
+        assert_approx_eq!(cos(60), cos(-60));
+        assert_approx_eq!(cos(60), 0.5);
     }
     #[test]
     fn test_inverse_tan() {
-        assert_eq!(inverse_tan(1.0), 45.0);
-        assert_eq!(inverse_tan(1.0 / -2.0), -26.56505117707799);
-        assert_eq!(inverse_tan(2.80 / 1.20), 66.80140948635182);
-        assert_eq!(inverse_tan(87.6 / 309.7), 15.793787773268155);
-        assert_eq!(inverse_tan(f64::sqrt(3.0)), 59.99999999999999);
-        assert_eq!(inverse_tan(100.0 / -200.0), -26.56505117707799);
-        assert_eq!(inverse_tan(1.0 / f64::sqrt(3.0)), 30.000000000000004);
+        assert_approx_eq!(inverse_tan(1.0), 45.0);
+        assert_approx_eq!(inverse_tan(f64::sqrt(3.0)), 60.);
+        assert_approx_eq!(inverse_tan(1.0 / f64::sqrt(3.0)), 30.);
+        assert_approx_eq!(inverse_tan(1.0 / -2.0), -26.565_051_177_077_99);
+        assert_approx_eq!(inverse_tan(2.80 / 1.20), 66.801_409_486_351_82);
+        assert_approx_eq!(inverse_tan(87.6 / 309.7), 15.793_787_773_268_155);
     }
     #[test]
     fn test_display() {
@@ -300,7 +312,7 @@ mod tests {
     }
     #[test]
     fn test_dot() {
-        assert_eq!(V1.dot(&V2), -162.4);
+        assert_approx_eq!(V1.dot(&V2), -162.4);
     }
     #[test]
     fn test_quadratic_equation() {
@@ -310,93 +322,91 @@ mod tests {
         assert_eq!(quadratic_equation(1, 0, 0), (0.0, 0.0));
         assert_eq!(
             quadratic_equation(3.1725, -39.4875, 121.214),
-            (6.946617853705707, 5.50019065693259),
+            (6.946_617_853_705_707, 5.500_190_656_932_59),
         );
     }
     #[test]
     fn test_pow() {
-        assert_eq!(2.0.pow(3), 8.0);
-        assert_eq!(2.0.pow(2), 4.0);
-        assert_eq!(2.0.pow(1), 2.0);
-        assert_eq!(0.0.pow(0), 1.0);
-        assert_eq!(2.0.pow(-1), 0.5);
-        assert_eq!(2.0.pow(-2), 0.25);
-        assert_eq!(2.0.pow(-3), 0.125);
-        assert_eq!((-1.0).pow(0), 1.0);
-        assert_eq!((-1.0).pow(-1), -1.0);
-        assert_eq!((-2.0).pow(-1), -0.5);
-        assert_eq!((-2.0).pow(-2), 0.25);
-        assert_eq!((-2.0).pow(-3), -0.125);
-        assert_eq!((-2.0).pow(-4), 0.0625);
-        assert_eq!((-2.0).pow(-5), -0.03125);
-        assert_eq!((-2.0).pow(-6), 0.015625);
-        assert_eq!((-2.0).pow(-7), -0.0078125);
-        assert_eq!((-2.0).pow(-8), 0.00390625);
-        assert_eq!(0.0.pow(-1), f64::INFINITY);
+        assert_approx_eq!(2.0.pow(3), 8.0);
+        assert_approx_eq!(2.0.pow(2), 4.0);
+        assert_approx_eq!(2.0.pow(1), 2.0);
+        assert_approx_eq!(0.0.pow(0), 1.0);
+        assert_approx_eq!(2.0.pow(-1), 0.5);
+        assert_approx_eq!(2.0.pow(-2), 0.25);
+        assert_approx_eq!(2.0.pow(-3), 0.125);
+        assert_approx_eq!((-1.0).pow(0), 1.0);
+        assert_approx_eq!((-1.0).pow(-1), -1.0);
+        assert_approx_eq!((-2.0).pow(-1), -0.5);
+        assert_approx_eq!((-2.0).pow(-2), 0.25);
+        assert_approx_eq!((-2.0).pow(-3), -0.125);
+        assert_approx_eq!((-2.0).pow(-4), 0.0625);
+        assert_approx_eq!((-2.0).pow(-5), -0.03125);
+        assert_approx_eq!((-2.0).pow(-6), 0.015_625);
+        assert_approx_eq!(0.0.pow(-1), f64::INFINITY);
     }
     #[test]
     fn test_sin() {
-        assert_eq!(sin(29.0) * 17000.0, 8241.76354418773);
-        assert_eq!(sin(29) * 17000.0, 8241.76354418773);
-        assert_eq!(sin(30.0), 0.49999999999999994);
-        assert_eq!(sin(45.0), 0.7071067811865475);
-        assert_eq!(sin(45), 0.7071067811865475);
-        assert_eq!(sin(60.0), f64::sqrt(3.0) / 2.0);
+        assert_approx_eq!(sin(30), 0.5);
+        assert_approx_eq!(sin(30.0), 0.5);
+        assert_approx_eq!(sin(45.0), 0.707_106_781_186_547_5);
+        assert_approx_eq!(sin(45), 0.707_106_781_186_547_5);
+        assert_approx_eq!(sin(60.0), f64::sqrt(3.0) / 2.0);
+        assert_approx_eq!(sin(60), f64::sqrt(3.0) / 2.0);
     }
     #[test]
     fn test_sqrt() {
-        assert_eq!(sqrt(0), 0.0);
-        assert_eq!(sqrt(1), 1.0);
-        assert_eq!(sqrt(1.0), 1.0);
-        assert_eq!(sqrt(2), std::f64::consts::SQRT_2);
-        assert_eq!(sqrt(2.0), std::f64::consts::SQRT_2);
-        assert_eq!(sqrt(3.0), f64::sqrt(3.0));
-        assert_eq!(sqrt(3), f64::sqrt(3.0));
-        assert_eq!(sqrt(4.0), 2.0);
-        assert_eq!(sqrt(4), 2.0);
-        assert_eq!(sqrt(9), 3.0);
+        assert_approx_eq!(sqrt(0), 0.0);
+        assert_approx_eq!(sqrt(1), 1.0);
+        assert_approx_eq!(sqrt(1.0), 1.0);
+        assert_approx_eq!(sqrt(2), std::f64::consts::SQRT_2);
+        assert_approx_eq!(sqrt(2.0), std::f64::consts::SQRT_2);
+        assert_approx_eq!(sqrt(3.0), f64::sqrt(3.0));
+        assert_approx_eq!(sqrt(3), f64::sqrt(3.0));
+        assert_approx_eq!(sqrt(4.0), 2.0);
+        assert_approx_eq!(sqrt(4), 2.0);
+        assert_approx_eq!(sqrt(9), 3.0);
     }
     #[test]
     fn test_tan() {
-        assert_eq!(tan(29), 0.554309051452769);
-        assert_eq!(tan(29.0), 0.554309051452769);
-        assert_eq!(tan(30.0), 0.5773502691896257);
-        assert_eq!(tan(45.0), 0.9999999999999999);
-        assert_eq!(tan(60.0), 1.7320508075688767);
+        assert_approx_eq!(tan(29), 0.554_309_051_452_769);
+        assert_approx_eq!(tan(29.0), 0.554_309_051_452_769);
+        assert_approx_eq!(tan(30), 0.577_350_269_189_625_7);
+        assert_approx_eq!(tan(30.0), 0.577_350_269_189_625_7);
+        assert_approx_eq!(tan(45.0), 0.999_999_999_999_999_9);
+        assert_approx_eq!(tan(60.0), 1.732_050_807_568_876_7);
     }
     #[test]
     fn test_the_magnitude_of() {
-        assert_eq!(the_magnitude_of(&Vector([0.0])), 0.0);
-        assert_eq!(the_magnitude_of(&Vector([1.0])), 1.0);
-        assert_eq!(the_magnitude_of(&Vector([-1.0])), 1.0);
-        assert_eq!(the_magnitude_of(&Vector([3.0, 4.0])), 5.0);
-        assert_eq!(the_magnitude_of(&Vector([6.0, 8.0])), 10.0);
-        assert_eq!(the_magnitude_of(&Vector([3.0, 4.0, 0.0])), 5.0);
-        assert_eq!(the_magnitude_of(&Vector([6.0, 8.0, 0.0])), 10.0);
-        assert_eq!(the_magnitude_of(&Vector([3.0, 4.0, 0.0, 0.0])), 5.0);
-        assert_eq!(the_magnitude_of(&Vector([6.0, 8.0, 0.0, 0.0])), 10.0);
-        assert_eq!(the_magnitude_of(&Vector([0.0, 0.0, 3.0, 0.0, 4.0])), 5.0);
-        assert_eq!(the_magnitude_of(&Vector([-7.0, 9.0])), 11.40175425099138);
-        assert_eq!(the_magnitude_of(&Vector([-3.0, 5.0])), 5.830951894845301);
-        assert_eq!(the_magnitude_of(&Vector([10.0, 23.0])), 25.079872407968907);
-        assert_eq!(
-            the_magnitude_of(&Vector([1.2000000000000002, 2.8000000000000003])),
-            3.0463092423455636
+        assert_approx_eq!(the_magnitude_of(&Vector([0.0])), 0.0);
+        assert_approx_eq!(the_magnitude_of(&Vector([1.0])), 1.0);
+        assert_approx_eq!(the_magnitude_of(&Vector([-1.0])), 1.0);
+        assert_approx_eq!(the_magnitude_of(&Vector([3.0, 4.0])), 5.0);
+        assert_approx_eq!(the_magnitude_of(&Vector([6.0, 8.0])), 10.0);
+        assert_approx_eq!(the_magnitude_of(&Vector([3.0, 4.0, 0.0])), 5.0);
+        assert_approx_eq!(the_magnitude_of(&Vector([6.0, 8.0, 0.0])), 10.0);
+        assert_approx_eq!(the_magnitude_of(&Vector([3.0, 4.0, 0.0, 0.0])), 5.0);
+        assert_approx_eq!(the_magnitude_of(&Vector([6.0, 8.0, 0.0, 0.0])), 10.0);
+        assert_approx_eq!(the_magnitude_of(&Vector([0.0, 0.0, 3.0, 0.0, 4.0])), 5.0);
+        assert_approx_eq!(the_magnitude_of(&Vector([-7.0, 9.0])), 11.401_754_250_991_3);
+        assert_approx_eq!(the_magnitude_of(&Vector([-3.0, 5.0])), 5.830_951_894_845_30);
+        assert_approx_eq!(
+            the_magnitude_of(&Vector([1.200_000_000_000_000_2, 2.800_000_000_000_000_3])),
+            3.046_309_242_345_563_6
         );
 
-        assert_eq!(the_magnitude_of(Vector([0.0])), 0.0);
-        assert_eq!(the_magnitude_of(Vector([1.0])), 1.0);
-        assert_eq!(the_magnitude_of(Vector([-1.0])), 1.0);
-        assert_eq!(the_magnitude_of(Vector([3.0, 4.0])), 5.0);
-        assert_eq!(the_magnitude_of(Vector([6.0, 8.0])), 10.0);
-        assert_eq!(the_magnitude_of(Vector([3.0, 4.0, 0.0])), 5.0);
-        assert_eq!(the_magnitude_of(Vector([6.0, 8.0, 0.0])), 10.0);
-        assert_eq!(the_magnitude_of(Vector([3.0, 4.0, 0.0, 0.0])), 5.0);
-        assert_eq!(the_magnitude_of(Vector([6.0, 8.0, 0.0, 0.0])), 10.0);
-        assert_eq!(the_magnitude_of(Vector([0.0, 0.0, 3.0, 0.0, 4.0])), 5.0);
-        assert_eq!(the_magnitude_of(Vector([-7.0, 9.0])), 11.40175425099138);
-        assert_eq!(the_magnitude_of(Vector([-3.0, 5.0])), 5.830951894845301);
-        assert_eq!(the_magnitude_of(Vector([10.0, 23.0])), 25.079872407968907);
+        assert_approx_eq!(the_magnitude_of(Vector([0.0])), 0.0);
+        assert_approx_eq!(the_magnitude_of(Vector([1.0])), 1.0);
+        assert_approx_eq!(the_magnitude_of(Vector([-1.0])), 1.0);
+        assert_approx_eq!(the_magnitude_of(Vector([3.0, 4.0])), 5.0);
+        assert_approx_eq!(the_magnitude_of(Vector([6.0, 8.0])), 10.0);
+        assert_approx_eq!(the_magnitude_of(Vector([3.0, 4.0, 0.0])), 5.0);
+        assert_approx_eq!(the_magnitude_of(Vector([6.0, 8.0, 0.0])), 10.0);
+        assert_approx_eq!(the_magnitude_of(Vector([3.0, 4.0, 0.0, 0.0])), 5.0);
+        assert_approx_eq!(the_magnitude_of(Vector([6.0, 8.0, 0.0, 0.0])), 10.0);
+        assert_approx_eq!(the_magnitude_of(Vector([0.0, 0.0, 3.0, 0.0, 4.0])), 5.0);
+        assert_approx_eq!(the_magnitude_of(Vector([-7.0, 9.0])), 11.401_754_250_991_38);
+        assert_approx_eq!(the_magnitude_of(Vector([-3.0, 5.0])), 5.830_951_894_845_301);
+        assert_approx_eq!(the_magnitude_of(Vector([10.0, 23.0])), 25.079_872_407_968_9);
     }
     #[test]
     fn test_the_moment_of_inertia_of() {
@@ -404,12 +414,12 @@ mod tests {
         let m0 = [50.into(); 4];
         let m1 = [0.02, 0.02, 0.02, 0.02, 0.02, 0.02];
         let r1 = [0.25, 0.15, 0.05, 0.05, 0.15, 0.25];
-        assert_eq!(the_moment_of_inertia_of(&m0, &r0), 3200.into());
-        assert_eq!(the_moment_of_inertia_of(&m1, &r1), 0.0034999999999999996);
+        assert_approx_eq!(the_moment_of_inertia_of(&m0, &r0), 3200.0);
+        assert_approx_eq!(the_moment_of_inertia_of(&m1, &r1), 0.003_499_999_999_999);
     }
     #[test]
     fn test_the_angle_between() {
-        assert_eq!(the_angle_between(&V1, &V2), 116.02154864365895);
+        assert_approx_eq!(the_angle_between(&V1, &V2), 116.021_548_643_658_95);
     }
     #[test]
     fn test_vector_addition() {
@@ -435,7 +445,6 @@ mod tests {
         assert_eq!(Vector([3.0, 4.0]) / 2.0, Vector([1.5, 2.0]));
         assert_eq!(Vector([6.0, 8.0]) / 2.0, Vector([3.0, 4.0]));
         assert_eq!(Vector([1.234, 0.0]) / 2.0, Vector([0.617, 0.0]));
-        assert_eq!(Vector([555.55]) / 5.0, Vector([111.10999999999999]));
         assert_eq!(Vector([3.0, 4.0, 0.0]) / 2.0, Vector([1.5, 2.0, 0.0]));
         assert_eq!(Vector([1.0, 2.0, 3.0]) / 2.0, Vector([0.5, 1.0, 1.5]));
     }
