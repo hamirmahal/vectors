@@ -349,12 +349,15 @@ mod tests {
     }
     #[test]
     fn test_sin() {
+        assert_approx_eq!(sin(0), 0.0);
         assert_approx_eq!(sin(30), 0.5);
         assert_approx_eq!(sin(30.0), 0.5);
         assert_approx_eq!(sin(45.0), 0.707_106_781_186_547_5);
         assert_approx_eq!(sin(45), 0.707_106_781_186_547_5);
         assert_approx_eq!(sin(60.0), f64::sqrt(3.0) / 2.0);
         assert_approx_eq!(sin(60), f64::sqrt(3.0) / 2.0);
+        assert_approx_eq!(sin(90.0), 1.0);
+        assert_approx_eq!(sin(90), 1.0);
     }
     #[test]
     fn test_sqrt() {
