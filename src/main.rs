@@ -126,8 +126,8 @@ fn main() {
     let centripetal_acceleration = get_centripetal_acceleration(20.0, 14.9);
     let v_x = cos(29.0) * 17000.0;
     let v_y = sin(29.0) * 17000.0;
-    let i = inverse_tan(2.0);
-    let t = tan(i);
+    let inverse = inverse_tan(2.0);
+    let t = tan(inverse);
     dbg!(t);
     dbg!(v_x);
     dbg!(v_y);
