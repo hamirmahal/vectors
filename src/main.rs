@@ -54,7 +54,7 @@ impl<'a, const N: usize> std::ops::Add<&'a Vector<N>> for &'a Vector<N> {
         )
     }
 }
-impl<'a, const N: usize> std::ops::Add<Vector<N>> for &'a Vector<N> {
+impl<const N: usize> std::ops::Add<Vector<N>> for &Vector<N> {
     type Output = Vector<N>;
     fn add(self, rhs: Vector<N>) -> Vector<N> {
         self + &rhs
